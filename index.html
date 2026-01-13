@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Games</title>
+  <style>
+    :root{
+      --bg0:#0a0b10;
+      --bg1:#0e1020;
+      --card:#111225;
+      --text:#e9ecff;
+      --muted:rgba(233,236,255,.65);
+      --border:rgba(255,255,255,.10);
+      --shadow: 0 18px 50px rgba(0,0,0,.45);
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:var(--font);
+      color:var(--text);
+      background:
+        radial-gradient(900px 600px at 15% 10%, rgba(139,92,246,.28), transparent 60%),
+        radial-gradient(900px 600px at 85% 15%, rgba(83,141,78,.22), transparent 60%),
+        radial-gradient(900px 600px at 60% 95%, rgba(245,158,11,.18), transparent 60%),
+        linear-gradient(180deg, var(--bg1), var(--bg0));
+      display:flex;
+      justify-content:center;
+    }
+    header{
+      position:sticky; top:0; z-index:10;
+      backdrop-filter: blur(10px);
+      background: linear-gradient(to bottom, rgba(10,11,16,.90), rgba(10,11,16,.65));
+      border-bottom:1px solid var(--border);
+    }
+    .wrap{ width:min(980px, 100%); padding: 0 16px 28px; }
+    .top{
+      height:64px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .brand{
+      display:flex; gap:12px; align-items:center;
+    }
+    .logo{
+      width:42px;height:42px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(139,92,246,.35), rgba(83,141,78,.28));
+      border:1px solid rgba(255,255,255,.14);
+      box-shadow: var(--shadow);
+      display:grid; place-items:center;
+    }
+    .logo svg{ width:22px;height:22px; opacity:.95; }
+    .title{
+      font-weight: 950;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      margin:0;
+      font-size: 18px;
+      line-height:1.1;
+    }
+    .subtitle{
+      margin-top:4px;
+      font-size:12px;
+      color:var(--muted);
+    }
+
+    .search{
+      display:flex; gap:10px; align-items:center;
+      width:min(420px, 100%);
+    }
+    input{
+      width:100%;
+      border-radius: 16px;
+      padding: 12px 14px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      color: var(--text);
+      outline:none;
+      font-weight: 800;
+    }
+    input::placeholder{ color: rgba(233,236,255,.55); font-weight:700; }
+    .btn{
+      border:none;
+      border-radius: 16px;
+      padding: 12px 14px;
+      font-weight: 950;
+      cursor:pointer;
+      color: var(--text);
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+    }
+    .btn:active{ transform: translateY(1px); }
+
+    .hero{
+      padding: 18px 0 8px;
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap: 16px;
+    }
+    .hero h2{
+      margin:0;
+      font-size: 26px;
+      letter-spacing: .01em;
+    }
+    .hero p{
+      margin:6px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+      max-width: 520px;
+    }
+
+    .grid{
+      margin-top: 10px;
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: 12px;
+    }
+    .card{
+      position:relative;
+      border-radius: 18px;
+      padding: 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      background:
+        radial-gradient(420px 220px at 0% 0%, rgba(255,255,255,.10), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      box-shadow: var(--shadow);
+      text-decoration:none;
+      color: var(--text);
+      display:flex;
+      gap: 12px;
+      align-items:center;
+      transition: transform .10s ease, border-color .12s ease, filter .12s ease;
+      overflow:hidden;
+    }
+    .card:hover{ transform: translateY(-1px); border-color: rgba(255,255,255,.22); }
+    .card:active{ transform: translateY(0px); }
+
+    .icon{
+      width:46px;height:46px;
+      border-radius: 16px;
+      border:1px solid rgba(255,255,255,.14);
+      display:grid; place-items:center;
+      flex: 0 0 46px;
+    }
+    .icon svg{ width:24px;height:24px; }
+
+    .meta{ min-width:0; }
+    .name{ font-weight: 950; font-size: 15px; letter-spacing:.01em; }
+    .desc{ margin-top:4px; font-size: 12px; color: var(--muted); line-height: 1.35; }
+
+    .pill{
+      position:absolute;
+      top:12px;
+      right:12px;
+      font-size:11px;
+      font-weight: 950;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(0,0,0,.22);
+      backdrop-filter: blur(8px);
+      color: rgba(233,236,255,.90);
+    }
+
+    /* color accents per game */
+    .g-wordle .icon{ background: rgba(83,141,78,.18); }
+    .g-wordle .icon svg{ fill: #6bd46c; }
+
+    .g-connections .icon{ background: rgba(245,158,11,.16); }
+    .g-connections .icon svg{ fill: #ffbf4a; }
+
+    .g-strands .icon{ background: rgba(139,92,246,.18); }
+    .g-strands .icon svg{ fill: #c4a7ff; }
+
+    .g-sudoku .icon{ background: rgba(239,68,68,.14); }
+    .g-sudoku .icon svg{ fill: #ff7a7a; }
+
+    .g-letterboxed .icon{ background: rgba(96,165,250,.16); }
+    .g-letterboxed .icon svg{ fill: #98c5ff; }
+
+    .g-bee .icon{ background: rgba(247,209,84,.16); }
+    .g-bee .icon svg{ fill: #ffd766; }
+
+    .g-tiles .icon{ background: rgba(34,197,94,.14); }
+    .g-tiles .icon svg{ fill: #7ef0a8; }
+
+    .g-mini .icon{ background: rgba(255,255,255,.10); }
+    .g-mini .icon svg{ fill: rgba(233,236,255,.92); }
+
+    .g-crossword .icon{ background: rgba(255,255,255,.10); }
+    .g-crossword .icon svg{ fill: rgba(233,236,255,.92); }
+
+    @media (max-width: 880px){
+      .grid{ grid-template-columns: repeat(2, minmax(0,1fr)); }
+    }
+    @media (max-width: 640px){
+      .top{ height:auto; padding: 12px 0; flex-direction:column; align-items:stretch; }
+      .search{ width:100%; }
+      .grid{ grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <div class="top">
+        <div class="brand">
+          <div class="logo" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M7.5 12c0-3 2-5 4.5-5s4.5 2 4.5 5-2 6-4.5 6S7.5 15 7.5 12Z" fill="rgba(233,236,255,.92)"/>
+              <path d="M9.5 9.4h5M9 12h6M9.5 14.6h5" stroke="rgba(10,11,16,.65)" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div>
+            <div class="title">Games</div>
+            <div class="subtitle">Pick one. Unlimited runs. New puzzle every time.</div>
+          </div>
+        </div>
+
+        <div class="search">
+          <input id="q" placeholder="Search…" autocomplete="off"/>
+          <button class="btn" id="random">Random</button>
+        </div>
+      </div>
+
+      <div class="hero">
+        <div>
+          <h2>Choose a game</h2>
+          <p>Everything here generates a new puzzle on demand. No daily cap.</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="grid" id="grid">
+      <a class="card g-strands" data-name="Strands" href="strands.html">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M5 6h14v3H5V6Zm0 5h10v3H5v-3Zm0 5h14v3H5v-3Z"/></svg></div>
+        <div class="meta"><div class="name">Strands</div><div class="desc">Word-search theme hunt.</div></div>
+        <div class="pill">PLAY</div>
+      </a>
+
+      <a class="card g-mini" data-name="The Mini Crossword" href="mini-crossword.html">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4V4Zm3 3v3h3V7H7Zm0 5v5h5v-5H7Zm7-5v10h3V7h-3Z"/></svg></div>
+        <div class="meta"><div class="name">The Mini Crossword</div><div class="desc">Small fill-in grid.</div></div>
+        <div class="pill">PLAY</div>
+      </a>
+
+      <a class="card g-connections" data-name="Connections" href="connections.html">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M6 6h5v5H6V6Zm7 0h5v5h-5V6ZM6 13h5v5H6v-5Zm7 0h5v5h-5v-5Z"/></svg></div>
+        <div class="meta"><div class="name">Connections</div><div class="desc">Group 16 words into 4 sets.</div></div>
+        <div class="pill">PLAY</div>
+      </a>
+
+      <a class="card g-wordle" data-name="Wordle" href="wordle.html">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M4 5h16v14H4V5Zm3 3h4v4H7V8Zm6 0h4v4h-4V8ZM7 14h10v3H7v-3Z"/></svg></div>
+        <div class="meta"><div class="name">Wordle</div><div class="desc">Guess the 5-letter word.</div></div>
+        <div class="pill">PLAY</div>
+      </a>
+
+      <a class="card g-sudoku" data-name="Sudoku" href="sudoku.html">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4V4Zm2 2v4h4V6H6Zm6 0v4h6V6h-6ZM6 12v6h4v-6H6Zm6 0v6h6v-6h-6Z"/></svg></div>
+        <div class="meta"><div class="name">Sudoku</div><div class="desc">Generate + solve puzzles.</div></div>
+        <div class="pill">PLAY</div>
+      </a>
+
+      <a class="card g-crossword" data-name="The Crossword" href="crossword.html">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4V4Zm3 3h4v4H7V7Zm0 6h4v4H7v-4Zm6-6h4v4h-4V7Zm0 6h4v4h-4v-4Z"/></svg></div>
+        <div class="meta"><div class="name">The Crossword</div><div class="desc">Bigger fill-in grid.</div></div>
+        <div class="pill">PLAY</div>
+      </a>
+
+    </div>
+  </main>
+
+  <script>
+    const q = document.getElementById('q');
+    const grid = document.getElementById('grid');
+    const randomBtn = document.getElementById('random');
+
+    function filter(){
+      const term = (q.value||'').trim().toLowerCase();
+      [...grid.querySelectorAll('[data-name]')].forEach(a=>{
+        const name = (a.getAttribute('data-name')||'').toLowerCase();
+        a.style.display = (!term || name.includes(term)) ? '' : 'none';
+      });
+    }
+    q.addEventListener('input', filter);
+
+    randomBtn.addEventListener('click', ()=>{
+      const links = [...grid.querySelectorAll('a[href]')].filter(a=>a.href);
+      const pick = links[Math.floor(Math.random()*links.length)];
+      if (pick) window.location.href = pick.getAttribute('href');
+    });
+  </script>
+</body>
+</html>

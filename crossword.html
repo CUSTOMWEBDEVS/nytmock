@@ -1,0 +1,630 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>The Crossword</title>
+  <style>
+    :root{
+      --bg:#0b0c12; --text:#e9ecff; --muted:rgba(233,236,255,.65);
+      --border:rgba(255,255,255,.12); --shadow:0 18px 50px rgba(0,0,0,.45);
+      --card:rgba(255,255,255,.06);
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:var(--font); color:var(--text);
+      background:
+        radial-gradient(900px 600px at 15% 10%, rgba(233,236,255,.14), transparent 60%),
+        radial-gradient(900px 600px at 85% 70%, rgba(96,165,250,.14), transparent 60%),
+        linear-gradient(180deg, #0f1020, var(--bg));
+      display:flex; justify-content:center;
+    }
+    .wrap{ width:min(1100px,100%); padding: 0 16px 22px; }
+    header{
+      height:64px; display:flex; align-items:center; justify-content:space-between; gap:10px;
+      position:sticky; top:0; z-index:10;
+      backdrop-filter: blur(10px);
+      background: linear-gradient(to bottom, rgba(11,12,18,.90), rgba(11,12,18,.55));
+      border-bottom:1px solid var(--border);
+    }
+    .btn{
+      border:none; border-radius: 14px; padding: 12px 14px; font-weight: 950;
+      cursor:pointer; color:var(--text);
+      background: rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12);
+    }
+    .btn:active{ transform:translateY(1px); }
+    .title{ font-weight: 950; letter-spacing:.06em; text-transform:uppercase; }
+
+    .panel{ margin-top:14px; display:grid; grid-template-columns: 1fr 420px; gap:12px; align-items:start; }
+    .card{
+      background: var(--card);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius: 18px;
+      padding: 14px;
+      box-shadow: var(--shadow);
+    }
+
+    .grid{
+      width: min(520px, 100%);
+      margin: 0 auto;
+      display:grid;
+      grid-template-columns: repeat(9, 1fr);
+      border-radius: 18px;
+      overflow:hidden;
+      border: 2px solid rgba(255,255,255,.16);
+      background: rgba(0,0,0,.18);
+      box-shadow: var(--shadow);
+    }
+    .cell{
+      position:relative;
+      aspect-ratio: 1 / 1;
+      border: 1px solid rgba(255,255,255,.10);
+      display:grid;
+      place-items:center;
+    }
+    .cell.block{ background: rgba(255,255,255,.06); }
+    .cell.sel{
+      outline: 2px solid rgba(255,255,255,.22);
+      outline-offset: -2px;
+      background: rgba(255,255,255,.06);
+    }
+    .cell .num{
+      position:absolute;
+      top:4px; left:5px;
+      font-size: 10px;
+      color: rgba(233,236,255,.60);
+      font-weight: 950;
+      user-select:none;
+    }
+    .cell input{
+      width:100%; height:100%;
+      border:none; outline:none;
+      background: transparent;
+      color: var(--text);
+      text-align:center;
+      font-weight: 950;
+      font-size: 18px;
+      text-transform: uppercase;
+      padding: 0;
+    }
+
+    .tabs{ display:flex; gap:10px; flex-wrap:wrap; }
+    .tab{
+      border-radius: 999px;
+      padding: 8px 12px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.18);
+      font-weight: 950;
+      cursor:pointer;
+      user-select:none;
+    }
+    .tab.on{
+      border-color: rgba(255,255,255,.22);
+      background: rgba(255,255,255,.08);
+    }
+
+    .clues{ margin-top: 12px; display:flex; flex-direction:column; gap:8px; max-height: 520px; overflow:auto; padding-right: 6px; }
+    .clue{
+      border-radius: 14px;
+      padding: 10px 12px;
+      background: rgba(0,0,0,.22);
+      border:1px solid rgba(255,255,255,.10);
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+    }
+    .clue b{ width: 32px; flex:0 0 32px; }
+    .clue span{ color: var(--muted); font-weight: 900; font-size: 12px; line-height: 1.35; }
+
+    .rowBtns{ display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:12px; }
+
+    .toast{
+      position:fixed; top:74px; left:50%; transform:translateX(-50%);
+      background: rgba(0,0,0,.40); border:1px solid rgba(255,255,255,.14);
+      border-radius: 999px; padding: 10px 14px; font-weight: 900;
+      backdrop-filter: blur(10px);
+      opacity:0; pointer-events:none; transition:opacity .15s ease;
+      max-width: calc(100% - 24px);
+      white-space: nowrap; overflow:hidden; text-overflow: ellipsis;
+      z-index:9999;
+    }
+    .toast.show{ opacity:1; }
+
+    @media (max-width: 980px){
+      .panel{ grid-template-columns: 1fr; }
+      .grid{ width: min(520px, 100%); }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <button class="btn" id="home">⌂ Home</button>
+      <div class="title">The Crossword</div>
+      <button class="btn" id="new">New</button>
+    </header>
+
+    <div class="panel">
+      <div class="card">
+        <div class="grid" id="grid"></div>
+        <div class="rowBtns">
+          <button class="btn" id="check">Check</button>
+          <button class="btn" id="reveal">Reveal</button>
+          <button class="btn" id="clear">Clear</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="tabs">
+          <div class="tab on" id="tabA">Across</div>
+          <div class="tab" id="tabD">Down</div>
+        </div>
+        <div class="clues" id="clues"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+(() => {
+  const N = 9;
+  const DICT_URL = "https://raw.githubusercontent.com/dwyl/english-words/master/words_alpha.txt"; // huge list :contentReference[oaicite:2]{index=2}
+  const CACHE_KEY = "xword9_dict_v1";
+  const CACHE_META = "xword9_dict_v1_meta";
+
+  const gridEl = document.getElementById('grid');
+  const cluesEl = document.getElementById('clues');
+  const toastEl = document.getElementById('toast');
+
+  function toast(msg, ms=1400){
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    clearTimeout(toast._t);
+    toast._t = setTimeout(()=>toastEl.classList.remove('show'), ms);
+  }
+
+  function randInt(n){
+    const x = new Uint32Array(1); crypto.getRandomValues(x);
+    return x[0] % n;
+  }
+  function shuffle(a){
+    for (let i=a.length-1;i>0;i--){
+      const j = randInt(i+1);
+      [a[i],a[j]]=[a[j],a[i]];
+    }
+  }
+
+  function idx(r,c){ return r*N+c; }
+  function inb(r,c){ return r>=0 && r<N && c>=0 && c<N; }
+
+  let blocks = Array(N*N).fill(false);
+  let solution = Array(N*N).fill('');
+  let inputs = Array(N*N).fill(null);
+  let across = [];
+  let down = [];
+  let tab = 'A';
+  let WORDS_BY_LEN = new Map();
+
+  async function loadDict(){
+    try{
+      const cached = localStorage.getItem(CACHE_KEY);
+      if (cached){
+        const parsed = JSON.parse(cached);
+        WORDS_BY_LEN = new Map(parsed.map(([k,v]) => [Number(k), v]));
+        const meta = localStorage.getItem(CACHE_META);
+        toast(meta ? meta : `Loaded cached dictionary`, 1200);
+        return;
+      }
+    }catch(_){}
+
+    toast("Loading dictionary…", 2000);
+    const res = await fetch(DICT_URL, { cache: "force-cache" });
+    if (!res.ok) throw new Error("Dictionary download failed");
+    const text = await res.text();
+
+    const byLen = new Map();
+    const lines = text.split(/\r?\n/);
+    for (const raw of lines){
+      const w = (raw||"").trim().toUpperCase();
+      if (!w) continue;
+      if (!/^[A-Z]+$/.test(w)) continue;
+      if (w.length < 3 || w.length > 9) continue;
+      if (!byLen.has(w.length)) byLen.set(w.length, []);
+      byLen.get(w.length).push(w);
+    }
+    for (const [k,v] of byLen.entries()) shuffle(v);
+
+    WORDS_BY_LEN = byLen;
+
+    try{
+      localStorage.setItem(CACHE_KEY, JSON.stringify([...byLen.entries()]));
+      localStorage.setItem(CACHE_META, `Loaded ${lines.length.toLocaleString()} words (cached)`);
+    }catch(_){}
+
+    toast(`Loaded ${lines.length.toLocaleString()} words`, 1400);
+  }
+
+  function validLayout(){
+    // min slot length 3 for both directions
+    // across
+    for (let r=0;r<N;r++){
+      let run=0;
+      for (let c=0;c<N;c++){
+        if (!blocks[idx(r,c)]) run++;
+        else { if (run>0 && run<3) return false; run=0; }
+      }
+      if (run>0 && run<3) return false;
+    }
+    // down
+    for (let c=0;c<N;c++){
+      let run=0;
+      for (let r=0;r<N;r++){
+        if (!blocks[idx(r,c)]) run++;
+        else { if (run>0 && run<3) return false; run=0; }
+      }
+      if (run>0 && run<3) return false;
+    }
+
+    // connectivity
+    const open=[];
+    for (let i=0;i<N*N;i++) if (!blocks[i]) open.push(i);
+    if (!open.length) return false;
+
+    const seen=new Set([open[0]]);
+    const q=[open[0]];
+    while(q.length){
+      const i=q.pop();
+      const r=Math.floor(i/N), c=i%N;
+      for (const [rr,cc] of [[r-1,c],[r+1,c],[r,c-1],[r,c+1]]){
+        if(!inb(rr,cc)) continue;
+        const j=idx(rr,cc);
+        if(blocks[j]||seen.has(j)) continue;
+        seen.add(j); q.push(j);
+      }
+    }
+    return seen.size===open.length;
+  }
+
+  function makeLayout(){
+    blocks = Array(N*N).fill(false);
+
+    // symmetric blocks; not too sparse, not too dense
+    const target = 16 + randInt(13); // 16..28
+    let placed=0, tries=0;
+
+    while(placed<target && tries++<1200){
+      const r=randInt(N), c=randInt(N);
+      const r2=N-1-r, c2=N-1-c;
+      const a=idx(r,c), b=idx(r2,c2);
+
+      if (a===idx(4,4) && randInt(3)!==0) continue; // avoid blocking center often
+
+      blocks[a]=true; blocks[b]=true;
+      if(!validLayout()){
+        blocks[a]=false; blocks[b]=false;
+        continue;
+      }
+      placed += (a===b)?1:2;
+    }
+
+    if(!validLayout()){
+      blocks = Array(N*N).fill(false);
+    }
+  }
+
+  function getSlots(){
+    const out=[];
+    // across
+    for (let r=0;r<N;r++){
+      let c=0;
+      while(c<N){
+        while(c<N && blocks[idx(r,c)]) c++;
+        const start=c;
+        while(c<N && !blocks[idx(r,c)]) c++;
+        const len=c-start;
+        if(len>=3){
+          const cells=[];
+          for(let k=0;k<len;k++) cells.push(idx(r,start+k));
+          out.push({dir:'A', len, cells});
+        }
+      }
+    }
+    // down
+    for (let c=0;c<N;c++){
+      let r=0;
+      while(r<N){
+        while(r<N && blocks[idx(r,c)]) r++;
+        const start=r;
+        while(r<N && !blocks[idx(r,c)]) r++;
+        const len=r-start;
+        if(len>=3){
+          const cells=[];
+          for(let k=0;k<len;k++) cells.push(idx(start+k,c));
+          out.push({dir:'D', len, cells});
+        }
+      }
+    }
+    return out;
+  }
+
+  function patternFor(slot){
+    let s="";
+    for(const i of slot.cells) s += (solution[i] || ".");
+    return s;
+  }
+
+  function candidateCount(slot, used){
+    const pool = WORDS_BY_LEN.get(slot.len) || [];
+    const pat = patternFor(slot);
+    let count=0;
+    for (const w of pool){
+      if (used.has(w)) continue;
+      let ok=true;
+      for (let i=0;i<slot.len;i++){
+        const p=pat[i];
+        if (p!=='.' && p!==w[i]) { ok=false; break; }
+      }
+      if(ok) count++;
+      if(count>80) break;
+    }
+    return count;
+  }
+
+  function candidates(slot, used){
+    const pool = (WORDS_BY_LEN.get(slot.len) || []).slice();
+    shuffle(pool);
+    const pat = patternFor(slot);
+    const out=[];
+    for (const w of pool){
+      if (used.has(w)) continue;
+      let ok=true;
+      for (let i=0;i<slot.len;i++){
+        const p=pat[i];
+        if (p!=='.' && p!==w[i]) { ok=false; break; }
+      }
+      if(ok) out.push(w);
+      if(out.length>=260) break;
+    }
+    return out;
+  }
+
+  function fillGrid(){
+    solution = Array(N*N).fill('');
+    const slots = getSlots();
+    const used = new Set();
+
+    function pickNextSlot(){
+      // MRV: choose hardest slot next
+      let best=-1, bestCount=1e9;
+      for (let i=0;i<slots.length;i++){
+        const s=slots[i];
+        if (s.cells.every(ci => solution[ci])) continue;
+        const c = candidateCount(s, used);
+        if (c < bestCount){
+          bestCount=c; best=i;
+          if (c<=1) break;
+        }
+      }
+      return best;
+    }
+
+    function setWord(slot, w){
+      const changed=[];
+      for (let i=0;i<slot.len;i++){
+        const cell=slot.cells[i];
+        if (!solution[cell]){
+          solution[cell]=w[i];
+          changed.push(cell);
+        }
+      }
+      used.add(w);
+      return changed;
+    }
+    function unset(w, changed){
+      for (const cell of changed) solution[cell]='';
+      used.delete(w);
+    }
+
+    function dfs(){
+      const si = pickNextSlot();
+      if (si === -1) return true;
+      const slot = slots[si];
+
+      const cand = candidates(slot, used);
+      if (!cand.length) return false;
+
+      for (const w of cand){
+        const changed = setWord(slot, w);
+        if (dfs()) return true;
+        unset(w, changed);
+      }
+      return false;
+    }
+
+    return dfs();
+  }
+
+  function buildNumbers(){
+    const nums = Array(N*N).fill(0);
+    let n=1;
+    for (let r=0;r<N;r++){
+      for (let c=0;c<N;c++){
+        const i=idx(r,c);
+        if (blocks[i]) continue;
+        const startsAcross = (c===0 || blocks[idx(r,c-1)]) && (c+1<N && !blocks[idx(r,c+1)]);
+        const startsDown   = (r===0 || blocks[idx(r-1,c)]) && (r+1<N && !blocks[idx(r+1,c)]);
+        if (startsAcross || startsDown) nums[i]=n++;
+      }
+    }
+    return nums;
+  }
+
+  function scrambleHard(w){
+    const a=w.split('');
+    for (let i=a.length-1;i>0;i--){
+      const j=randInt(i+1);
+      [a[i],a[j]]=[a[j],a[i]];
+    }
+    // hide 2 letters to make it harder
+    if (a.length >= 5){
+      a[randInt(a.length)] = "•";
+      a[randInt(a.length)] = "•";
+    }
+    return a.join('');
+  }
+
+  function buildClues(nums){
+    across=[]; down=[];
+    const all=getSlots();
+    for (const s of all){
+      const word=s.cells.map(i=>solution[i]).join('');
+      const clue = `Scramble: ${scrambleHard(word)} (${word.length})`;
+      const start=s.cells[0];
+      const entry={ num: nums[start], clue, answer: word, cells: s.cells };
+      if(s.dir==='A') across.push(entry);
+      else down.push(entry);
+    }
+    across.sort((a,b)=>a.num-b.num);
+    down.sort((a,b)=>a.num-b.num);
+  }
+
+  function renderGrid(nums){
+    gridEl.innerHTML="";
+    inputs = Array(N*N).fill(null);
+
+    for (let r=0;r<N;r++){
+      for (let c=0;c<N;c++){
+        const i=idx(r,c);
+        const cell=document.createElement('div');
+        cell.className="cell";
+        if(blocks[i]) cell.classList.add("block");
+
+        if(!blocks[i] && nums[i]){
+          const num=document.createElement('div');
+          num.className="num";
+          num.textContent=String(nums[i]);
+          cell.appendChild(num);
+        }
+
+        if(!blocks[i]){
+          const inp=document.createElement('input');
+          inp.maxLength=1;
+          inp.autocomplete="off";
+          inp.spellcheck=false;
+
+          inp.addEventListener('input', ()=>{
+            inp.value=(inp.value||"").replace(/[^a-zA-Z]/g,"").slice(0,1).toUpperCase();
+          });
+          inp.addEventListener('focus', ()=>{
+            [...gridEl.children].forEach(el=>el.classList.remove('sel'));
+            cell.classList.add('sel');
+          });
+          cell.addEventListener('mousedown', ()=>inp.focus());
+
+          cell.appendChild(inp);
+          inputs[i]=inp;
+        }
+
+        gridEl.appendChild(cell);
+      }
+    }
+  }
+
+  function renderClues(){
+    cluesEl.innerHTML="";
+    const arr = (tab==='A') ? across : down;
+    for (const c of arr){
+      const row=document.createElement('div');
+      row.className="clue";
+      row.innerHTML = `<b>${c.num}</b><span>${c.clue}</span>`;
+      row.addEventListener('click', ()=>{
+        const first=c.cells[0];
+        if(inputs[first]) inputs[first].focus();
+      });
+      cluesEl.appendChild(row);
+    }
+  }
+
+  function clearFill(){
+    for(let i=0;i<N*N;i++){
+      if(blocks[i]) continue;
+      inputs[i].value="";
+    }
+    toast("Cleared", 900);
+  }
+
+  function reveal(){
+    for(let i=0;i<N*N;i++){
+      if(blocks[i]) continue;
+      inputs[i].value=solution[i];
+    }
+    toast("Revealed", 900);
+  }
+
+  function check(){
+    let bad=0, filled=0;
+    for(let i=0;i<N*N;i++){
+      if(blocks[i]) continue;
+      const v=(inputs[i].value||"").toUpperCase();
+      if(v) filled++;
+      if(v && v!==solution[i]) bad++;
+    }
+    if(!filled) toast("Empty", 900);
+    else if(!bad) toast("Looks good", 1200);
+    else toast(`${bad} incorrect`, 1200);
+  }
+
+  async function newPuzzle(){
+    if (!WORDS_BY_LEN.size) await loadDict();
+
+    toast("Generating…", 1200);
+
+    for (let attempt=0; attempt<18; attempt++){
+      makeLayout();
+      if (fillGrid()){
+        const nums = buildNumbers();
+        buildClues(nums);
+        renderGrid(nums);
+        renderClues();
+        clearFill();
+        toast("New puzzle");
+        return;
+      }
+    }
+
+    // fallback: zero-block fill
+    blocks = Array(N*N).fill(false);
+    if (!fillGrid()){
+      toast("Failed to generate (dictionary issue)", 2200);
+      return;
+    }
+    const nums = buildNumbers();
+    buildClues(nums);
+    renderGrid(nums);
+    renderClues();
+    clearFill();
+    toast("New puzzle");
+  }
+
+  // tabs
+  const tabA=document.getElementById('tabA');
+  const tabD=document.getElementById('tabD');
+  tabA.addEventListener('click', ()=>{ tab='A'; tabA.classList.add('on'); tabD.classList.remove('on'); renderClues(); });
+  tabD.addEventListener('click', ()=>{ tab='D'; tabD.classList.add('on'); tabA.classList.remove('on'); renderClues(); });
+
+  document.getElementById('new').addEventListener('click', newPuzzle);
+  document.getElementById('home').addEventListener('click', ()=>location.href="index.html");
+  document.getElementById('check').addEventListener('click', check);
+  document.getElementById('reveal').addEventListener('click', reveal);
+  document.getElementById('clear').addEventListener('click', clearFill);
+
+  newPuzzle().catch(err => {
+    console.error(err);
+    toast("Dictionary load blocked (offline?)", 2500);
+  });
+})();
+</script>
+</body>
+</html>

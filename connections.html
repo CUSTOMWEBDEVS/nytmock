@@ -1,0 +1,577 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Connections</title>
+  <style>
+    :root{
+      --bg:#0b0c12;
+      --panel: rgba(255,255,255,.06);
+      --border: rgba(255,255,255,.12);
+      --text:#e9ecff;
+      --muted: rgba(233,236,255,.65);
+      --shadow: 0 18px 50px rgba(0,0,0,.45);
+      --yellow:#f4c64f;
+      --green:#7bd08b;
+      --blue:#78aef5;
+      --purple:#b58cf6;
+      --tile: rgba(255,255,255,.07);
+      --tileHover: rgba(255,255,255,.10);
+      --sel: rgba(255,255,255,.16);
+      --btn: rgba(255,255,255,.08);
+      --btnHover: rgba(255,255,255,.11);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      background:
+        radial-gradient(1000px 650px at 14% 10%, rgba(96,165,250,.20), transparent 60%),
+        radial-gradient(900px 650px at 86% 75%, rgba(167,139,250,.14), transparent 60%),
+        linear-gradient(180deg, #0f1020, var(--bg));
+      color: var(--text);
+      display:flex;
+      justify-content:center;
+    }
+    .wrap{ width:min(980px, 100%); padding: 0 16px 18px; }
+    header{
+      height:64px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      position:sticky;
+      top:0;
+      z-index:10;
+      backdrop-filter: blur(10px);
+      background: linear-gradient(to bottom, rgba(11,12,18,.90), rgba(11,12,18,.55));
+      border-bottom:1px solid var(--border);
+    }
+    .title{ font-weight: 950; letter-spacing:.06em; text-transform: uppercase; }
+    .btn{
+      border:none;
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-weight: 950;
+      cursor:pointer;
+      color:var(--text);
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.12);
+      user-select:none;
+    }
+    .btn:hover{ background: rgba(255,255,255,.09); }
+    .btn:active{ transform: translateY(1px); }
+
+    .layout{
+      margin-top: 14px;
+      display:grid;
+      grid-template-columns: 1fr 300px;
+      gap: 12px;
+      align-items:start;
+    }
+    .card{
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      padding: 14px;
+      min-height: 340px;
+    }
+
+    .solvedWrap{ display:flex; flex-direction:column; gap:10px; margin-bottom: 12px; }
+    .solvedRow{
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.12);
+      padding: 12px 12px;
+      background: rgba(0,0,0,.20);
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+    .solvedTitle{
+      font-weight: 950;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      font-size: 12px;
+      color: rgba(0,0,0,.75);
+      padding: 10px 12px;
+      border-radius: 12px;
+      width: fit-content;
+    }
+    .solvedWords{
+      color: rgba(233,236,255,.78);
+      font-weight: 900;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing:.03em;
+      line-height: 1.35;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    .tile{
+      border:none;
+      border-radius: 16px;
+      background: var(--tile);
+      border:1px solid rgba(255,255,255,.12);
+      color: var(--text);
+      padding: 14px 10px;
+      font-weight: 950;
+      letter-spacing:.02em;
+      cursor:pointer;
+      text-transform: uppercase;
+      min-height: 56px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      user-select:none;
+      transition: transform .06s ease, background .12s ease, border-color .12s ease;
+      text-align:center;
+    }
+    .tile:hover{ background: var(--tileHover); }
+    .tile:active{ transform: translateY(1px); }
+    .tile.sel{
+      background: var(--sel);
+      border-color: rgba(255,255,255,.20);
+      box-shadow: 0 0 0 2px rgba(255,255,255,.10) inset;
+    }
+    .tile.disabled{ opacity:.55; cursor:not-allowed; }
+
+    .controls{
+      display:flex;
+      gap:10px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+    .controls .btn{
+      flex: 1 1 auto;
+      text-align:center;
+      background: var(--btn);
+      border-color: rgba(255,255,255,.14);
+    }
+    .controls .btn:hover{ background: var(--btnHover); }
+
+    .sideTitle{
+      font-weight: 950;
+      letter-spacing:.05em;
+      text-transform: uppercase;
+      margin: 0 0 10px;
+      opacity:.95;
+    }
+    .meta{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      color: var(--muted);
+      font-weight: 900;
+      font-size: 12px;
+    }
+    .pill{
+      padding: 10px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.18);
+    }
+    .hint{
+      margin-top: 12px;
+      color: var(--muted);
+      font-weight: 900;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .toast{
+      position:fixed;
+      top:74px;
+      left:50%;
+      transform:translateX(-50%);
+      background: rgba(0,0,0,.42);
+      border:1px solid rgba(255,255,255,.14);
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-weight: 950;
+      backdrop-filter: blur(10px);
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .15s ease;
+      max-width: calc(100% - 24px);
+      white-space: nowrap;
+      overflow:hidden;
+      text-overflow: ellipsis;
+      z-index:9999;
+    }
+    .toast.show{ opacity:1; }
+
+    @media (max-width: 920px){
+      .layout{ grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <button class="btn" id="home">⌂ Home</button>
+      <div class="title">Connections</div>
+      <button class="btn" id="new">New</button>
+    </header>
+
+    <div class="layout">
+      <div class="card">
+        <div class="solvedWrap" id="solved"></div>
+        <div class="grid" id="grid"></div>
+
+        <div class="controls">
+          <button class="btn" id="submit">Submit</button>
+          <button class="btn" id="shuffle">Shuffle</button>
+          <button class="btn" id="deselect">Deselect</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="sideTitle">Status</div>
+        <div class="meta">
+          <div class="pill" id="mistakes">Mistakes remaining: 4</div>
+          <div class="pill">Loaded: offline curated (NYT-ish)</div>
+          <div class="pill" id="seed"></div>
+        </div>
+        <div class="hint">
+          Same rules as NYT. This version aims for <b>hard but fair</b>:
+          some overlap + a couple red herrings, not “evil chaos”.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+(() => {
+  const MISTAKES_MAX = 4;
+  const GROUP_ORDER = [
+    {name:"YELLOW", color:"var(--yellow)"},
+    {name:"GREEN",  color:"var(--green)"},
+    {name:"BLUE",   color:"var(--blue)"},
+    {name:"PURPLE", color:"var(--purple)"},
+  ];
+
+  // Fair-hard tuning
+  const FAIR = {
+    attempts: 900,
+    // allow some ambiguity but not too many
+    minAmbiguousTiles: 3,
+    maxAmbiguousTiles: 7,
+    // require some red herrings but not a ton
+    minRedHerrings: 1,
+    maxRedHerrings: 4,
+    // avoid super obvious pattern buckets
+    maxSuffix3Clump: 3
+  };
+
+  const gridEl = document.getElementById("grid");
+  const solvedEl = document.getElementById("solved");
+  const toastEl = document.getElementById("toast");
+  const mistakesEl = document.getElementById("mistakes");
+  const seedEl = document.getElementById("seed");
+
+  function toast(msg, ms=1400){
+    toastEl.textContent = msg;
+    toastEl.classList.add("show");
+    clearTimeout(toast._t);
+    toast._t = setTimeout(()=>toastEl.classList.remove("show"), ms);
+  }
+  function randU32(){
+    const x = new Uint32Array(1);
+    crypto.getRandomValues(x);
+    return x[0] >>> 0;
+  }
+  function shuffle(a){
+    for(let i=a.length-1;i>0;i--){
+      const j = randU32() % (i+1);
+      [a[i],a[j]] = [a[j],a[i]];
+    }
+  }
+  function sampleN(arr, n){
+    const copy = arr.slice();
+    shuffle(copy);
+    return copy.slice(0, n);
+  }
+  const norm = (w)=> (w||"").trim().toUpperCase();
+
+  // Curated but not “impossible”
+  // (each category has 6-10 so we can vary boards a lot)
+  const LIB = [
+    { title: "___ LINE", words: ["BASE","BOTTOM","PUNCH","SHORE","PIPE","HEADLINE","OUTLINE","SIDELINE"] },
+    { title: "___ BAR", words: ["CANDY","GRANOLA","LAW","SALAD","TIKI","SPACE","TITLE","TOOL"] },
+    { title: "THINGS YOU CAN “DRAW”", words: ["CARD","PICTURE","GUN","BATH","CONCLUSION","LINE","BREATH","CROWD"] },
+    { title: "THINGS YOU CAN “CHARGE”", words: ["PHONE","BATTERY","CARD","ACCOUNT","SUSPECT","BULL","ADMISSION","FEE"] },
+    { title: "WORDS THAT ARE ALSO VERBS", words: ["BOOK","SHIP","RING","FILE","TRACK","TABLE","FIELD","SCORE"] },
+    { title: "___ LIGHT", words: ["MOON","DAY","SPOT","FLASH","HEAD","GAS","TRAFFIC","NIGHT"] },
+    { title: "___ CODE", words: ["ZIP","AREA","MORSE","DRESS","SOURCE","SECRET","DISCOUNT","ERROR"] },
+    { title: "___ WORK", words: ["HOME","FRAME","NETWORK","PAPER","TEAM","FIELD","GUESS","NEEDLE"] },
+    { title: "___ SHOT", words: ["MOON","LONG","BANK","SNAP","SCREEN","HEAD","ONE","HOT"] },
+    { title: "___ MAP", words: ["ROAD","MIND","HEAT","SITE","STAR","CONCEPT","WORLD","TOPO"] },
+    { title: "HOMOGRAPHS", words: ["BARK","BASS","BOW","CLUB","DATE","MATCH","SEAL","FAULT"] },
+    { title: "SILENT LETTER WORDS", words: ["KNIFE","KNEE","WRONG","PSALM","ISLAND","HONEST","WALK","DEBT"] },
+    { title: "WORDS THAT FOLLOW “OPEN”", words: ["MIC","BAR","HOUSE","SOURCE","SEA","MIND","FIELD","DOOR"] },
+    { title: "WORDS THAT FOLLOW “HOT”", words: ["DOG","WIRE","SEAT","TAKE","SHOT","LINE","SPOT","CAKE"] },
+    { title: "THINGS YOU CAN “CRACK”", words: ["EGG","JOKE","CODE","SAFE","KNUCKLES","WHIP","VOICE","SKULL"] },
+  ];
+
+  const WORD_TO_CATS = new Map();
+  for(const cat of LIB){
+    for(const w of cat.words.map(norm)){
+      if(!WORD_TO_CATS.has(w)) WORD_TO_CATS.set(w, new Set());
+      WORD_TO_CATS.get(w).add(cat.title);
+    }
+  }
+
+  function features(w){
+    const s = w.replace(/[^A-Z]/g,"");
+    return { len:s.length, prefix3:s.slice(0,3), suffix3:s.slice(-3), dbl:/([A-Z])\1/.test(s), phrase:w.includes(" "), hyp:w.includes("-") };
+  }
+
+  function makeHerringSets(words){
+    const items = words.map(w => ({w, f: features(w)}));
+    const buckets = new Map();
+    const add = (k,w)=>{ if(!buckets.has(k)) buckets.set(k,[]); buckets.get(k).push(w); };
+
+    for(const it of items){
+      const {w,f} = it;
+      if(f.suffix3) add("S3:"+f.suffix3, w);
+      if(f.prefix3) add("P3:"+f.prefix3, w);
+      add("LEN:"+f.len, w);
+      if(f.dbl) add("DBL", w);
+      if(f.phrase) add("PHRASE", w);
+      if(f.hyp) add("HYPHEN", w);
+    }
+
+    const out = [];
+    const seen = new Set();
+    for(const [k, arr] of buckets){
+      const uniq = Array.from(new Set(arr));
+      if(uniq.length < 4) continue;
+      const pick = sampleN(uniq, 4).slice().sort();
+      const id = pick.join("|");
+      if(seen.has(id)) continue;
+      seen.add(id);
+      out.push({k, set: pick});
+    }
+    return out;
+  }
+
+  function countAmbiguous(words){
+    let n = 0;
+    for(const w of words){
+      const s = WORD_TO_CATS.get(w);
+      if(s && s.size >= 2) n++;
+    }
+    return n;
+  }
+  function maxSuffix3Clump(words){
+    const m = new Map();
+    for(const w of words){
+      const s = w.replace(/[^A-Z]/g,"");
+      const suf = s.slice(-3);
+      if(!suf) continue;
+      m.set(suf, (m.get(suf)||0)+1);
+    }
+    let best = 0;
+    for(const v of m.values()) best = Math.max(best, v);
+    return best;
+  }
+
+  function generatePuzzle(seed){
+    for(let attempt=0; attempt<FAIR.attempts; attempt++){
+      const cats = sampleN(LIB, 4);
+      const chosen = cats.map(c => ({ title: c.title, words: sampleN(c.words.map(norm), 4) }));
+
+      const all = chosen.flatMap(g => g.words);
+      if(new Set(all).size !== 16) continue;
+
+      const amb = countAmbiguous(all);
+      if(amb < FAIR.minAmbiguousTiles || amb > FAIR.maxAmbiguousTiles) continue;
+
+      if(maxSuffix3Clump(all) > FAIR.maxSuffix3Clump) continue;
+
+      const herrings = makeHerringSets(all);
+      const trueSets = new Set(chosen.map(g => g.words.slice().sort().join("|")));
+      const usable = herrings.filter(h => !trueSets.has(h.set.join("|")));
+      if(usable.length < FAIR.minRedHerrings || usable.length > FAIR.maxRedHerrings) continue;
+
+      const tiles = all.slice();
+      shuffle(tiles);
+      return { seed, groups: chosen, tiles };
+    }
+
+    // fallback (always renders)
+    const cats = sampleN(LIB, 4);
+    const chosen = cats.map(c => ({ title: c.title, words: sampleN(c.words.map(norm), 4) }));
+    const tiles = chosen.flatMap(g => g.words);
+    shuffle(tiles);
+    return { seed, groups: chosen, tiles };
+  }
+
+  // ===== game state =====
+  let game = null;
+  let selected = new Set();
+  let solved = [];
+  let mistakes = MISTAKES_MAX;
+  let locked = false;
+
+  function setMistakesUI(){ mistakesEl.textContent = `Mistakes remaining: ${mistakes}`; }
+  function isWordSolved(w){ return solved.some(g => g.words.includes(w)); }
+
+  function renderSolved(){
+    solvedEl.innerHTML = "";
+    for(const g of solved){
+      const row = document.createElement("div");
+      row.className = "solvedRow";
+
+      const title = document.createElement("div");
+      title.className = "solvedTitle";
+      title.textContent = g.title;
+      title.style.background = g.colorVar;
+
+      const words = document.createElement("div");
+      words.className = "solvedWords";
+      words.textContent = g.words.join(" · ");
+
+      row.appendChild(title);
+      row.appendChild(words);
+      solvedEl.appendChild(row);
+    }
+  }
+
+  function renderGrid(){
+    gridEl.innerHTML = "";
+    for(const w of game.tiles){
+      if(isWordSolved(w)) continue;
+
+      const btn = document.createElement("button");
+      btn.className = "tile";
+      btn.textContent = w;
+
+      if(selected.has(w)) btn.classList.add("sel");
+      if(locked) btn.classList.add("disabled");
+
+      btn.addEventListener("click", () => {
+        if(locked) return;
+        if(selected.has(w)) selected.delete(w);
+        else{
+          if(selected.size >= 4){ toast("You can only select 4"); return; }
+          selected.add(w);
+        }
+        renderGrid();
+      });
+
+      gridEl.appendChild(btn);
+    }
+  }
+
+  function render(){
+    renderSolved();
+    renderGrid();
+    setMistakesUI();
+  }
+
+  function bestMatchCount(pick){
+    let best = 0;
+    for(const g of game.groups){
+      let c = 0;
+      for(const w of pick) if(g.words.includes(w)) c++;
+      best = Math.max(best, c);
+    }
+    return best;
+  }
+
+  function submit(){
+    if(locked) return;
+    if(selected.size !== 4){ toast("Select 4 words"); return; }
+
+    const pick = Array.from(selected);
+    selected.clear();
+
+    let matchIndex = -1;
+    for(let i=0;i<game.groups.length;i++){
+      const g = game.groups[i];
+      if(pick.every(w => g.words.includes(w))){ matchIndex = i; break; }
+    }
+
+    if(matchIndex !== -1){
+      const colorSlot = solved.length;
+      const color = GROUP_ORDER[colorSlot];
+      const g = game.groups[matchIndex];
+      solved.push({ title: g.title, words: g.words.slice(), colorVar: color.color });
+      toast("Correct");
+      render();
+      if(solved.length === 4) toast("Solved", 1600);
+      return;
+    }
+
+    mistakes--;
+    toast(bestMatchCount(pick) === 3 ? "One away" : "Not quite");
+
+    if(mistakes <= 0){
+      const already = new Set(solved.flatMap(s => s.words));
+      for(const g of game.groups){
+        if(g.words.some(w => already.has(w))) continue;
+        const colorSlot = solved.length;
+        const color = GROUP_ORDER[colorSlot] || {color:"rgba(255,255,255,.22)"};
+        solved.push({ title: g.title, words: g.words.slice(), colorVar: color.color });
+      }
+      locked = true;
+      toast("Out of mistakes — revealed", 1800);
+    }
+    render();
+  }
+
+  function deselect(){ if(locked) return; selected.clear(); render(); }
+  function shuffleUnsolved(){
+    if(locked) return;
+    const unsolved = game.tiles.filter(w => !isWordSolved(w));
+    shuffle(unsolved);
+    const newTiles = [];
+    let ui = 0;
+    for(const w of game.tiles){
+      if(isWordSolved(w)) newTiles.push(w);
+      else newTiles.push(unsolved[ui++]);
+    }
+    game.tiles = newTiles;
+    render();
+  }
+
+  function newGame(){
+    locked = false;
+    selected.clear();
+    solved = [];
+    mistakes = MISTAKES_MAX;
+
+    const seed = randU32().toString(16).toUpperCase();
+    seedEl.textContent = `Puzzle seed: ${seed}`;
+
+    game = generatePuzzle(seed);
+    render();
+    toast("New puzzle");
+  }
+
+  document.getElementById("home").addEventListener("click", ()=>location.href="index.html");
+  document.getElementById("new").addEventListener("click", newGame);
+  document.getElementById("submit").addEventListener("click", submit);
+  document.getElementById("shuffle").addEventListener("click", shuffleUnsolved);
+  document.getElementById("deselect").addEventListener("click", deselect);
+
+  window.addEventListener("keydown", (e)=>{
+    if(e.key === "Enter") submit();
+    if(e.key === "Escape") deselect();
+  });
+
+  newGame();
+})();
+</script>
+</body>
+</html>
