@@ -13,12 +13,21 @@
       --muted: rgba(233,236,255,.65);
       --shadow: 0 18px 50px rgba(0,0,0,.45);
 
-      --cell: rgba(255,255,255,.08);
-      --cell2: rgba(255,255,255,.10);
-      --sel: rgba(96,165,250,.22);
-      --found: rgba(34,197,94,.22);
-      --span: rgba(245,158,11,.22);
+      --tile: rgba(255,255,255,.07);
+      --tileHover: rgba(255,255,255,.10);
+      --sel: rgba(255,255,255,.18);
+      --found: rgba(123,208,139,.22);
+      --spangram: rgba(181,140,246,.22);
+
+      --btn: rgba(255,255,255,.08);
+      --btnHover: rgba(255,255,255,.11);
+
+      --accent:#78aef5;
+      --ok:#7bd08b;
+      --warn:#f4c64f;
+      --bad:#ff6b6b;
     }
+
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
@@ -26,19 +35,14 @@
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
       background:
         radial-gradient(1000px 650px at 14% 10%, rgba(96,165,250,.20), transparent 60%),
-        radial-gradient(900px 650px at 86% 75%, rgba(245,158,11,.12), transparent 60%),
+        radial-gradient(900px 650px at 86% 75%, rgba(167,139,250,.14), transparent 60%),
         linear-gradient(180deg, #0f1020, var(--bg));
       color: var(--text);
       display:flex;
       justify-content:center;
-      user-select:none;
-      -webkit-user-select:none;
-      touch-action: manipulation;
     }
-    .wrap{
-      width:min(1040px, 100%);
-      padding: 0 16px 18px;
-    }
+
+    .wrap{ width:min(1040px, 100%); padding: 0 16px 18px; }
     header{
       height:64px;
       display:flex;
@@ -56,6 +60,20 @@
       font-weight: 950;
       letter-spacing:.06em;
       text-transform: uppercase;
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .badge{
+      font-weight: 950;
+      font-size: 11px;
+      letter-spacing:.06em;
+      text-transform: uppercase;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.18);
+      color: rgba(233,236,255,.85);
     }
     .btn{
       border:none;
@@ -66,16 +84,19 @@
       color:var(--text);
       background: rgba(255,255,255,.06);
       border:1px solid rgba(255,255,255,.12);
+      user-select:none;
     }
+    .btn:hover{ background: rgba(255,255,255,.09); }
     .btn:active{ transform: translateY(1px); }
 
-    .board{
+    .layout{
       margin-top: 14px;
       display:grid;
-      grid-template-columns: 1fr 360px;
+      grid-template-columns: 1fr 320px;
       gap: 12px;
       align-items:start;
     }
+
     .card{
       background: var(--panel);
       border: 1px solid var(--border);
@@ -84,44 +105,103 @@
       padding: 14px;
     }
 
+    .topline{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .theme{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      min-width: 240px;
+    }
+    .theme .label{
+      font-weight: 950;
+      letter-spacing:.06em;
+      text-transform: uppercase;
+      font-size: 12px;
+      color: rgba(233,236,255,.80);
+    }
+    .theme .value{
+      font-weight: 950;
+      letter-spacing:.02em;
+      font-size: 16px;
+    }
+    .theme .sub{
+      color: var(--muted);
+      font-weight: 900;
+      font-size: 12px;
+      line-height:1.35;
+    }
+
     .grid{
-      width: min(520px, 100%);
-      margin: 0 auto;
       display:grid;
-      grid-template-columns: repeat(8, 1fr);
-      gap: 8px;
-      padding: 8px;
-      border-radius: 18px;
-      background: rgba(0,0,0,.18);
-      border: 1px solid rgba(255,255,255,.12);
-      box-shadow: var(--shadow);
-      touch-action: none;
+      gap:10px;
+      justify-content:center;
+      user-select:none;
+      touch-action:none;
     }
     .cell{
-      aspect-ratio: 1/1;
+      width: 52px;
+      height: 52px;
       border-radius: 16px;
-      background: var(--cell);
-      border: 1px solid rgba(255,255,255,.12);
-      display:grid;
-      place-items:center;
+      display:flex;
+      align-items:center;
+      justify-content:center;
       font-weight: 950;
-      font-size: 20px;
       text-transform: uppercase;
-      transition: background .08s ease, transform .06s ease, border-color .12s ease;
+      letter-spacing:.05em;
+      background: var(--tile);
+      border:1px solid rgba(255,255,255,.12);
+      cursor:pointer;
+      transition: transform .06s ease, background .12s ease, border-color .12s ease;
+      position:relative;
     }
-    .cell:hover{ background: var(--cell2); }
+    .cell:hover{ background: var(--tileHover); }
+    .cell:active{ transform: translateY(1px); }
+
     .cell.sel{
       background: var(--sel);
-      border-color: rgba(96,165,250,.35);
+      border-color: rgba(255,255,255,.22);
+      box-shadow: 0 0 0 2px rgba(255,255,255,.10) inset;
     }
     .cell.found{
       background: var(--found);
-      border-color: rgba(34,197,94,.35);
+      border-color: rgba(123,208,139,.32);
     }
-    .cell.spangram{
-      background: var(--span);
-      border-color: rgba(245,158,11,.35);
+    .cell.spangramFound{
+      background: var(--spangram);
+      border-color: rgba(181,140,246,.34);
     }
+    .cell .dot{
+      position:absolute;
+      top:7px;
+      right:7px;
+      width:8px;
+      height:8px;
+      border-radius:999px;
+      background: rgba(255,255,255,.0);
+    }
+    .cell.found .dot{ background: rgba(123,208,139,.85); }
+    .cell.spangramFound .dot{ background: rgba(181,140,246,.90); }
+
+    .controls{
+      display:flex;
+      gap:10px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+    .controls .btn{
+      flex: 1 1 auto;
+      text-align:center;
+      background: var(--btn);
+      border-color: rgba(255,255,255,.14);
+    }
+    .controls .btn:hover{ background: var(--btnHover); }
 
     .sideTitle{
       font-weight: 950;
@@ -130,51 +210,36 @@
       margin: 0 0 10px;
       opacity:.95;
     }
-    .meta{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      color: var(--muted);
+
+    .pill{
+      padding: 10px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.18);
+      color: rgba(233,236,255,.82);
       font-weight: 900;
       font-size: 12px;
+      margin-bottom: 10px;
     }
-    .meta .pill{
+
+    .foundList{
+      display:flex;
+      flex-wrap: wrap;
+      gap:8px;
+    }
+    .chip{
       padding: 8px 10px;
       border-radius: 999px;
       border: 1px solid rgba(255,255,255,.12);
       background: rgba(0,0,0,.18);
-    }
-    .list{
-      margin-top: 12px;
-      display:flex;
-      flex-direction:column;
-      gap: 8px;
-      max-height: 420px;
-      overflow:auto;
-      padding-right: 6px;
-    }
-    .item{
-      padding: 10px 12px;
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.22);
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:10px;
-    }
-    .item b{
       font-weight: 950;
-      text-transform: uppercase;
+      font-size: 12px;
       letter-spacing:.03em;
-      font-size: 12px;
+      text-transform: uppercase;
+      color: rgba(233,236,255,.86);
     }
-    .item span{
-      color: var(--muted);
-      font-weight: 900;
-      font-size: 12px;
-      white-space: nowrap;
-    }
+    .chip.sp{ border-color: rgba(181,140,246,.35); background: rgba(181,140,246,.14); }
+    .chip.th{ border-color: rgba(123,208,139,.35); background: rgba(123,208,139,.14); }
 
     .toast{
       position:fixed;
@@ -199,8 +264,8 @@
     .toast.show{ opacity:1; }
 
     @media (max-width: 980px){
-      .board{ grid-template-columns: 1fr; }
-      .grid{ width: min(520px, 100%); }
+      .layout{ grid-template-columns: 1fr; }
+      .cell{ width: 48px; height: 48px; }
     }
   </style>
 </head>
@@ -208,24 +273,46 @@
   <div class="wrap">
     <header>
       <button class="btn" id="home">⌂ Home</button>
-      <div class="title">Strands</div>
+      <div class="title">
+        <span>Strands</span>
+        <span class="badge" id="badge">Spangram + Theme</span>
+      </div>
       <button class="btn" id="new">New</button>
     </header>
 
-    <div class="board">
+    <div class="layout">
       <div class="card">
+        <div class="topline">
+          <div class="theme">
+            <div class="label">Theme</div>
+            <div class="value" id="themeTitle">Loading…</div>
+            <div class="sub" id="themeSub">Find the spangram, then the theme words.</div>
+          </div>
+          <div class="pill" id="status">Ready</div>
+        </div>
+
         <div class="grid" id="grid"></div>
+
+        <div class="controls">
+          <button class="btn" id="submit">Submit</button>
+          <button class="btn" id="clear">Clear</button>
+          <button class="btn" id="reveal">Reveal</button>
+        </div>
       </div>
 
       <div class="card">
-        <div class="sideTitle">Puzzle</div>
-        <div class="meta">
-          <div class="pill" id="theme">Theme: …</div>
-          <div class="pill" id="progress">0 / 0</div>
-          <div class="pill" id="loaded">Loading words…</div>
+        <div class="sideTitle">Found</div>
+        <div class="pill" id="seed"></div>
+        <div class="pill" id="progress"></div>
+        <div class="foundList" id="foundList"></div>
+        <div style="height:10px"></div>
+        <div class="pill" style="color:rgba(233,236,255,.75); line-height:1.45;">
+          Controls:
+          <br/>• Click / drag to select adjacent letters (8 directions)
+          <br/>• Submit to check a word
+          <br/>• Clear cancels current selection
+          <br/>• Reveal shows all answers for this board
         </div>
-
-        <div class="list" id="list"></div>
       </div>
     </div>
   </div>
@@ -234,19 +321,71 @@
 
 <script>
 (() => {
-  const ROWS = 6, COLS = 8;
-  const CELL_COUNT = ROWS * COLS;
+  // ====== CONFIG ======
+  const ROWS = 8;
+  const COLS = 6;
+  const TOTAL = ROWS * COLS;
 
-  const DICT_URL = "https://raw.githubusercontent.com/dwyl/english-words/master/words_alpha.txt";
-  const CACHE_KEY = "strands_dict_v1";
+  // Theme packs. Each one has:
+  // - theme title
+  // - spangram (1 long phrase-ish string, letters only)
+  // - theme words (multiple, letters only)
+  //
+  // The generator *builds the grid from these letters*, then hides the paths.
+  const PACKS = [
+    {
+      theme: "COFFEE ORDER",
+      spangram: "COFFEEHOUSEMENU",
+      words: ["LATTE","MOCHA","ESPRESSO","AMERICANO","CAPPUCCINO","MACCHIATO"]
+    },
+    {
+      theme: "MOVIE NIGHT",
+      spangram: "POPCORNMOVIETIME",
+      words: ["TRAILER","TICKETS","CINEMA","SCREEN","SUBTITLES","SEQUEL"]
+    },
+    {
+      theme: "GAME DEV",
+      spangram: "BUILDINGGAMEENGINE",
+      words: ["SHADER","TEXTURE","MESH","PHYSICS","CAMERA","SPRITE"]
+    },
+    {
+      theme: "MUSIC GEAR",
+      spangram: "STUDIORECORDINGKIT",
+      words: ["MIC","CABLE","MIXER","TRACKS","HEADPHONES","AMPLIFIER"]
+    },
+    {
+      theme: "ROAD TRIP",
+      spangram: "HIGHWAYVACATIONPLAN",
+      words: ["MOTEL","MAPS","SNACKS","GAS","MILEAGE","DET0UR".replace("0","O")]
+    },
+    {
+      theme: "KITCHEN TIME",
+      spangram: "COOKINGANDMEALPREP",
+      words: ["SKILLET","SPATULA","RECIPE","CHOP","BOIL","BAKE"]
+    },
+    {
+      theme: "TECH WORDS",
+      spangram: "INTERNETPROTOCOLS",
+      words: ["ROUTER","PACKET","DOMAIN","SERVER","CLIENT","LATENCY"]
+    },
+    {
+      theme: "HARDWARE",
+      spangram: "COMPUTERPARTSBUILD",
+      words: ["GPU","CPU","RAM","DRIVE","FANS","CASE"]
+    },
+  ];
 
+  // ====== DOM ======
   const gridEl = document.getElementById("grid");
-  const listEl = document.getElementById("list");
   const toastEl = document.getElementById("toast");
-  const themeEl = document.getElementById("theme");
+  const statusEl = document.getElementById("status");
+  const themeTitleEl = document.getElementById("themeTitle");
+  const themeSubEl = document.getElementById("themeSub");
+  const seedEl = document.getElementById("seed");
   const progressEl = document.getElementById("progress");
-  const loadedEl = document.getElementById("loaded");
+  const foundListEl = document.getElementById("foundList");
 
+  // ====== UTILS ======
   function toast(msg, ms=1400){
     toastEl.textContent = msg;
     toastEl.classList.add("show");
@@ -254,502 +393,438 @@
     toast._t = setTimeout(()=>toastEl.classList.remove("show"), ms);
   }
 
-  function randInt(n){
+  function randU32(){
     const x = new Uint32Array(1);
     crypto.getRandomValues(x);
-    return x[0] % n;
+    return x[0] >>> 0;
   }
   function shuffle(a){
     for(let i=a.length-1;i>0;i--){
-      const j = randInt(i+1);
+      const j = randU32() % (i+1);
       [a[i],a[j]] = [a[j],a[i]];
     }
   }
+  function lettersOnly(s){
+    return (s||"").toUpperCase().replace(/[^A-Z]/g,"");
+  }
+  function key(r,c){ return r + "," + c; }
+  function inBounds(r,c){ return r>=0 && r<ROWS && c>=0 && c<COLS; }
 
-  function idx(r,c){ return r*COLS + c; }
-  function rc(i){ return [Math.floor(i/COLS), i%COLS]; }
-  function inb(r,c){ return r>=0 && r<ROWS && c>=0 && c<COLS; }
-
-  // 8-direction adjacency (NYT-like drag)
-  const DIRS = [
-    [-1,-1],[-1,0],[-1,1],
-    [0,-1],[0,1],
-    [1,-1],[1,0],[1,1]
-  ];
-
-  let WORDS = []; // uppercase, 4..14
-  async function loadDict(){
-    try{
-      const raw = localStorage.getItem(CACHE_KEY);
-      if(raw){
-        WORDS = JSON.parse(raw) || [];
-        loadedEl.textContent = `Loaded ${WORDS.length.toLocaleString()} cached`;
-        return;
-      }
-    }catch(_){}
-
-    loadedEl.textContent = "Loading dictionary…";
-    const res = await fetch(DICT_URL, { cache: "force-cache" });
-    if(!res.ok) throw new Error("Dictionary download failed");
-    const text = await res.text();
-    const lines = text.split(/\r?\n/);
-
+  function neighbors(r,c){
     const out = [];
-    for(const raw of lines){
-      const w = (raw||"").trim().toUpperCase();
-      if(!w) continue;
-      if(!/^[A-Z]+$/.test(w)) continue;
-      if(w.length < 4 || w.length > 14) continue;
-      out.push(w);
+    for(let dr=-1; dr<=1; dr++){
+      for(let dc=-1; dc<=1; dc++){
+        if(dr===0 && dc===0) continue;
+        const rr = r+dr, cc=c+dc;
+        if(inBounds(rr,cc)) out.push({r:rr,c:cc});
+      }
     }
-    shuffle(out);
-    WORDS = out;
-
-    loadedEl.textContent = `Loaded ${out.length.toLocaleString()} words`;
-    try{ localStorage.setItem(CACHE_KEY, JSON.stringify(out)); }catch(_){}
+    return out;
   }
 
-  // ===== THEMES (hard, but consistent) =====
-  // We generate theme sets using structural rules so we can build MANY puzzles out of a plain dictionary.
-  const THEMES = [
-    {
-      name: "Ends with -TION",
-      pick: (w)=> w.endsWith("TION") && w.length>=6 && w.length<=12
-    },
-    {
-      name: "Ends with -MENT",
-      pick: (w)=> w.endsWith("MENT") && w.length>=6 && w.length<=12
-    },
-    {
-      name: "Ends with -NESS",
-      pick: (w)=> w.endsWith("NESS") && w.length>=6 && w.length<=12
-    },
-    {
-      name: "Starts with RE-",
-      pick: (w)=> w.startsWith("RE") && w.length>=6 && w.length<=12
-    },
-    {
-      name: "Starts with UN-",
-      pick: (w)=> w.startsWith("UN") && w.length>=6 && w.length<=12
-    },
-    {
-      name: "Contains digraph (TH/CH/SH/PH/CK)",
-      pick: (w)=> /TH|CH|SH|PH|CK/.test(w) && w.length>=5 && w.length<=12
-    },
-    {
-      name: "Double-letter words",
-      pick: (w)=> {
-        if(w.length<5||w.length>12) return false;
-        for(let i=1;i<w.length;i++) if(w[i]===w[i-1]) return true;
-        return false;
-      }
-    },
-    {
-      name: "Vowel-heavy (≥5 vowels)",
-      pick: (w)=> {
-        if(w.length<7||w.length>14) return false;
-        const v = (w.match(/[AEIOU]/g)||[]).length;
-        return v>=5;
-      }
-    }
-  ];
+  function idxOf(r,c){ return r*COLS + c; }
+  function rcOf(idx){ return { r: Math.floor(idx/COLS), c: idx % COLS }; }
 
-  function pickTheme(){
-    const t = THEMES[randInt(THEMES.length)];
-    return t;
+  function setStatus(msg, type=""){
+    statusEl.textContent = msg;
+    statusEl.style.color =
+      type==="ok" ? "var(--ok)" :
+      type==="warn" ? "var(--warn)" :
+      type==="bad" ? "var(--bad)" :
+      "rgba(233,236,255,.82)";
   }
 
-  function getThemePool(theme){
-    // sample a lot (fast enough)
-    const pool = [];
-    const sampleSize = Math.min(WORDS.length, 80000);
-    const start = randInt(Math.max(1, WORDS.length - sampleSize));
-    for(let i=0;i<sampleSize;i++){
-      const w = WORDS[(start+i)%WORDS.length];
-      if(theme.pick(w)) pool.push(w);
-      if(pool.length >= 5000) break;
-    }
-    shuffle(pool);
-    return pool;
-  }
-
-  // ===== GRID CONSTRUCTION =====
-  // We build a single Hamiltonian path through all cells and slice it into word segments.
-  // This guarantees:
-  // - every cell is used by exactly one word segment
-  // - each word is a contiguous path (bends allowed)
-  function makeHamiltonianPath(){
-    // Simple snake path (covers all cells). We then shuffle rows/cols via transforms to vary.
-    const path = [];
-    for(let r=0;r<ROWS;r++){
-      if(r%2===0){
-        for(let c=0;c<COLS;c++) path.push(idx(r,c));
-      }else{
-        for(let c=COLS-1;c>=0;c--) path.push(idx(r,c));
-      }
-    }
-
-    // Apply random transforms to avoid same visual each time:
-    // rotate / flip / reflect by mapping indices.
-    const mode = randInt(8);
-
-    function mapIndex(i){
-      let [r,c] = rc(i);
-      let rr=r, cc=c;
-
-      // modes: rotate 0/90/180/270 + optional flip
-      // We'll treat as operations on a ROWSxCOLS grid (6x8). Rotations swap dims; we avoid true rotation
-      // because 6x8 != 8x6. Instead we use flips and row/col swaps within same dims.
-      // 0: identity
-      // 1: flip horizontal
-      // 2: flip vertical
-      // 3: flip both
-      // 4: swap row halves
-      // 5: swap col halves
-      // 6: transpose-ish via block shuffle (still 6x8)
-      // 7: random row/col offset (wrap)
-      if(mode===1 || mode===3) cc = (COLS-1-cc);
-      if(mode===2 || mode===3) rr = (ROWS-1-rr);
-      if(mode===4){
-        // swap top/bottom halves
-        if(rr < Math.floor(ROWS/2)) rr += Math.floor(ROWS/2);
-        else rr -= Math.floor(ROWS/2);
-      }
-      if(mode===5){
-        // swap left/right halves (COLS is 8)
-        if(cc < 4) cc += 4;
-        else cc -= 4;
-      }
-      if(mode===6){
-        // shuffle rows within pairs
-        if(rr%2===0 && rr+1<ROWS && randInt(2)===1) rr = rr+1;
-        else if(rr%2===1 && randInt(2)===1) rr = rr-1;
-      }
-      if(mode===7){
-        const ro = randInt(ROWS);
-        const co = randInt(COLS);
-        rr = (rr + ro) % ROWS;
-        cc = (cc + co) % COLS;
-      }
-      return idx(rr,cc);
-    }
-
-    const mapped = path.map(mapIndex);
-
-    // ensure adjacency for snake mapping should hold for flips/offsets mostly;
-    // mode 7 offset keeps adjacency (wrap breaks at edges). That’s okay because selection paths use adjacency in final grid;
-    // we still provide the "true" paths via those mapped indices segments, which remain adjacent in snake on torus.
-    // To avoid wrap-adjacency issues, we’ll disallow mode 7.
-    if(mode===7) return makeHamiltonianPath(); // regenerate without wrap mode
-
-    return mapped;
-  }
-
-  function pickWordSetForGrid(themePool){
-    // Need words whose total length == CELL_COUNT.
-    // Include one spangram (10–14) and rest 4–9, all from themePool.
-    // Try multiple times.
-    for(let attempt=0; attempt<1200; attempt++){
-      const words = [];
-      const used = new Set();
-
-      // pick spangram
-      const spanCand = themePool.filter(w => w.length>=10 && w.length<=14);
-      if(spanCand.length < 200) continue;
-      const spangram = spanCand[randInt(spanCand.length)];
-      words.push(spangram);
-      used.add(spangram);
-
-      let remaining = CELL_COUNT - spangram.length;
-
-      // pick remaining theme words
-      let safety = 0;
-      while(remaining > 0 && safety++ < 4000){
-        // prefer 6–9 to reduce triviality
-        const targetLen = remaining >= 9 ? (6 + randInt(4)) : remaining;
-        const pool = themePool.filter(w => !used.has(w) && w.length === targetLen);
-        if(pool.length === 0){
-          // try any length 4..9 that fits
-          const altLens = [];
-          for(let L=4; L<=9; L++) if(L<=remaining) altLens.push(L);
-          if(!altLens.length) break;
-          const L = altLens[randInt(altLens.length)];
-          const alt = themePool.filter(w => !used.has(w) && w.length === L);
-          if(!alt.length) continue;
-          const w = alt[randInt(alt.length)];
-          words.push(w);
-          used.add(w);
-          remaining -= w.length;
-          continue;
-        } else {
-          const w = pool[randInt(pool.length)];
-          words.push(w);
-          used.add(w);
-          remaining -= w.length;
-        }
-      }
-
-      if(remaining !== 0) continue;
-
-      // sanity: enough words (NYT-ish feel)
-      if(words.length < 6) continue;
-
-      // shuffle word order but keep spangram first in returned structure
-      const rest = words.slice(1);
-      shuffle(rest);
-      return { spangram, words: [spangram, ...rest] };
-    }
-    return null;
-  }
-
-  // Build puzzle: assign each word to a contiguous path segment in the Hamiltonian path.
-  function buildPuzzle(){
-    const theme = pickTheme();
-    const pool = getThemePool(theme);
-    if(pool.length < 1500) throw new Error("Theme pool too small");
-
-    const ws = pickWordSetForGrid(pool);
-    if(!ws) throw new Error("Could not build word set");
-
-    const path = makeHamiltonianPath(); // length == CELL_COUNT
-    const segments = [];
-
-    let cursor = 0;
-    for(const w of ws.words){
-      const seg = path.slice(cursor, cursor + w.length);
-      cursor += w.length;
-      segments.push({ word: w, cells: seg });
-    }
-
-    // create grid letters
-    const letters = Array(CELL_COUNT).fill("");
-    segments.forEach(seg => {
-      const w = seg.word;
-      for(let i=0;i<w.length;i++){
-        letters[seg.cells[i]] = w[i];
-      }
-    });
-
-    // Build quick lookup for found words by string and also reverse (because player can drag backwards)
-    const wordMap = new Map();
-    for(const seg of segments){
-      wordMap.set(seg.word, seg);
-      wordMap.set(seg.word.split("").reverse().join(""), seg); // allow reverse
-    }
-
-    return {
-      themeName: theme.name,
-      letters,
-      segments,
-      spangram: ws.spangram,
-      wordMap
-    };
-  }
-
-  // ===== GAME STATE / UI =====
-  let puzzle = null;
-  let cellEls = [];
+  // ====== GAME STATE ======
+  let puzzle = null;        // {theme, spangram, words, gridLetters[], solutionPaths: Map(word->cells[]) }
+  let cells = [];           // DOM cell elements indexed by idx
   let selecting = false;
-  let selectedPath = [];   // indices
-  let selectedSet = new Set();
-  let foundWords = new Set();
-  let foundCells = new Set();
+  let selection = [];       // array of idx
+  let found = new Set();    // found words (including spangram)
+  let revealed = false;
 
-  function renderPuzzle(){
+  // ====== RENDER GRID ======
+  function buildGridDOM(letters){
     gridEl.innerHTML = "";
-    cellEls = [];
+    gridEl.style.gridTemplateColumns = `repeat(${COLS}, 52px)`;
+    gridEl.style.gridTemplateRows = `repeat(${ROWS}, 52px)`;
+    cells = new Array(TOTAL);
 
-    for(let i=0;i<CELL_COUNT;i++){
-      const d = document.createElement("div");
-      d.className = "cell";
-      d.textContent = puzzle.letters[i];
-      d.dataset.i = String(i);
-      gridEl.appendChild(d);
-      cellEls.push(d);
+    for(let i=0;i<TOTAL;i++){
+      const {r,c} = rcOf(i);
+      const el = document.createElement("div");
+      el.className = "cell";
+      el.id = `cell-${r}-${c}`;
+      el.dataset.idx = String(i);
+      el.textContent = letters[i] || "?";
+      const dot = document.createElement("div");
+      dot.className = "dot";
+      el.appendChild(dot);
+
+      el.addEventListener("pointerdown", (e)=>{
+        e.preventDefault();
+        if(revealed) return;
+        selecting = true;
+        startOrExtendSelection(i);
+        el.setPointerCapture?.(e.pointerId);
+      });
+      el.addEventListener("pointerenter", ()=>{
+        if(!selecting || revealed) return;
+        startOrExtendSelection(i);
+      });
+
+      cells[i] = el;
+      gridEl.appendChild(el);
     }
 
-    // list
-    listEl.innerHTML = "";
-    const total = puzzle.segments.length;
-    progressEl.textContent = `${foundWords.size} / ${total}`;
-
-    // show “slots” rather than answers (NYT hides the list; we show progress items)
-    // spangram shown as special slot
-    const spanItem = document.createElement("div");
-    spanItem.className = "item";
-    spanItem.innerHTML = `<b>Spangram</b><span>${foundWords.has(puzzle.spangram) ? puzzle.spangram : "??????"}</span>`;
-    listEl.appendChild(spanItem);
-
-    const other = puzzle.segments.map(s => s.word).filter(w => w !== puzzle.spangram);
-    const uniq = [...new Set(other)];
-    uniq.sort((a,b)=>b.length-a.length);
-
-    for(const w of uniq){
-      const it = document.createElement("div");
-      it.className = "item";
-      it.innerHTML = `<b>Theme word</b><span>${foundWords.has(w) ? w : "????"}</span>`;
-      listEl.appendChild(it);
-    }
-
-    themeEl.textContent = `Theme: ${puzzle.themeName}`;
-    loadedEl.textContent = `Loaded ${WORDS.length.toLocaleString()} words`;
-
-    paintCells();
+    window.addEventListener("pointerup", ()=>{ selecting=false; }, { once:false });
   }
 
-  function paintCells(){
-    for(let i=0;i<CELL_COUNT;i++){
-      const el = cellEls[i];
-      el.classList.remove("sel","found","spangram");
+  function cellElByIdx(i){ return cells[i]; }
 
-      if(foundCells.has(i)){
-        // if this cell belongs to spangram segment, give spangram styling
-        const spanSeg = puzzle.wordMap.get(puzzle.spangram);
-        if(spanSeg && spanSeg.cells.includes(i)) el.classList.add("spangram");
-        else el.classList.add("found");
-      }
-      if(selectedSet.has(i)) el.classList.add("sel");
+  // ====== SAFE PAINT (this prevents your crash) ======
+  function paintCells(idxs, addClass, removeClasses=[]){
+    if(!Array.isArray(idxs)) return;
+    for(const i of idxs){
+      const el = cellElByIdx(i);
+      if(!el) continue; // <- critical: never crash
+      for(const rc of removeClasses) if(rc) el.classList.remove(rc);
+      if(addClass) el.classList.add(addClass);
     }
   }
 
   function clearSelection(){
-    selectedPath = [];
-    selectedSet.clear();
-    paintCells();
+    paintCells(selection, null, ["sel"]);
+    selection = [];
   }
 
-  function isAdjacent(a,b){
-    const [ar,ac] = rc(a);
-    const [br,bc] = rc(b);
-    return Math.max(Math.abs(ar-br), Math.abs(ac-bc)) === 1;
+  function currentString(){
+    return selection.map(i => {
+      const el = cellElByIdx(i);
+      return el ? el.firstChild.textContent : "";
+    }).join("");
   }
 
-  function getCellFromEvent(e){
-    const t = e.target;
-    if(!t || !t.classList.contains("cell")) return null;
-    return Number(t.dataset.i);
+  function isAdjacent(a, b){
+    const A = rcOf(a), B = rcOf(b);
+    return Math.abs(A.r - B.r) <= 1 && Math.abs(A.c - B.c) <= 1 && !(A.r===B.r && A.c===B.c);
   }
 
-  function addToSelection(i){
-    if(i==null) return;
-    if(foundCells.has(i)) return; // already locked
-    if(selectedSet.has(i)) return;
-
-    if(selectedPath.length === 0){
-      selectedPath.push(i);
-      selectedSet.add(i);
-      paintCells();
+  function startOrExtendSelection(i){
+    if(selection.length === 0){
+      selection = [i];
+      paintCells([i], "sel");
+      setStatus(currentString());
       return;
     }
-    const last = selectedPath[selectedPath.length-1];
+    const last = selection[selection.length-1];
+
+    // allow backtracking one step
+    if(selection.length >= 2 && i === selection[selection.length-2]){
+      const removed = selection.pop();
+      paintCells([removed], null, ["sel"]);
+      setStatus(currentString());
+      return;
+    }
+
+    // must be adjacent and not already in path
     if(!isAdjacent(last, i)) return;
+    if(selection.includes(i)) return;
 
-    selectedPath.push(i);
-    selectedSet.add(i);
-    paintCells();
+    selection.push(i);
+    paintCells([i], "sel");
+    setStatus(currentString());
   }
 
-  function selectionString(){
-    return selectedPath.map(i => puzzle.letters[i]).join("");
+  function markFound(word){
+    const isSp = (word === puzzle.spangram);
+    const path = puzzle.solutionPaths.get(word);
+    if(path){
+      paintCells(path, isSp ? "spangramFound" : "found");
+    }
+    found.add(word);
+    renderFoundList();
+    renderProgress();
   }
 
-  function commitIfWord(){
-    const s = selectionString();
-    if(s.length < 4){
-      clearSelection();
+  function renderFoundList(){
+    foundListEl.innerHTML = "";
+    const all = [puzzle.spangram, ...puzzle.words];
+    for(const w of all){
+      if(!found.has(w)) continue;
+      const chip = document.createElement("div");
+      chip.className = "chip " + (w===puzzle.spangram ? "sp" : "th");
+      chip.textContent = w;
+      foundListEl.appendChild(chip);
+    }
+  }
+
+  function renderProgress(){
+    const totalTargets = 1 + puzzle.words.length;
+    const got = found.size;
+    progressEl.textContent = `Progress: ${got}/${totalTargets}`;
+  }
+
+  // ====== PUZZLE GENERATION ======
+  // We need to:
+  // 1) Choose a pack
+  // 2) Pick a subset of theme words so total letters = grid size with the spangram
+  // 3) Lay each word as an actual path in the grid (no overlaps)
+  // 4) Fill letters accordingly
+  //
+  // This guarantees every letter belongs to a word -> NYT-like.
+  function pickPack(){
+    const p = PACKS[randU32() % PACKS.length];
+    const sp = lettersOnly(p.spangram);
+    const ws = p.words.map(lettersOnly).filter(Boolean);
+
+    return { theme: p.theme, spangram: sp, words: ws };
+  }
+
+  function chooseWordsToFitGrid(spangram, words){
+    // target letters total = TOTAL
+    // we force the spangram in, then choose theme words to fill remaining letters.
+    const remain = TOTAL - spangram.length;
+    if(remain <= 0) throw new Error("Spangram too long for grid");
+
+    // Greedy pick longer words first, then adjust
+    const sorted = words.slice().sort((a,b)=> b.length - a.length);
+    const chosen = [];
+    let left = remain;
+
+    for(const w of sorted){
+      if(w.length <= left && chosen.length < 8){
+        chosen.push(w);
+        left -= w.length;
+      }
+      if(left === 0) break;
+    }
+
+    // If not exact fill, try swapping / smaller words
+    if(left !== 0){
+      // brute-ish small search limited
+      const pool = words.slice().sort((a,b)=> a.length - b.length);
+      for(let tries=0; tries<4000 && left !== 0; tries++){
+        // restart attempt
+        chosen.length = 0;
+        left = remain;
+
+        // random pick to try exact fill
+        const bag = pool.slice();
+        shuffle(bag);
+
+        for(const w of bag){
+          if(w.length <= left && chosen.length < 10){
+            chosen.push(w);
+            left -= w.length;
+          }
+          if(left === 0) break;
+        }
+      }
+    }
+
+    // Still not exact? pad with extra letters from spangram (allowed in this clone)
+    // But to keep it “real”, we instead extend the grid by sprinkling duplicate letters
+    // while still being selectable; NYT has filler letters that still belong to words.
+    // Here we enforce exact fill by trimming chosen until fits, then add a SHORT word list.
+    if(left !== 0){
+      // try exact fill by selecting a different subset (simple backtrack)
+      const pool = words.slice().filter(w => w.length <= remain);
+      for(let attempt=0; attempt<2000; attempt++){
+        const picked = [];
+        let L = remain;
+        const bag = pool.slice();
+        shuffle(bag);
+        for(const w of bag){
+          if(w.length <= L && picked.length < 10){
+            picked.push(w);
+            L -= w.length;
+          }
+          if(L === 0) break;
+        }
+        if(L === 0) return picked;
+      }
+
+      // last resort: allow a couple single-letter "theme" fillers (still solvable)
+      const fillers = ["A","E","I","O","U"];
+      while(left > 0){
+        chosen.push(fillers[randU32()%fillers.length]);
+        left--;
+      }
+    }
+
+    return chosen;
+  }
+
+  function emptyBoard(){
+    const used = new Array(TOTAL).fill(false);
+    const letters = new Array(TOTAL).fill("");
+    return { used, letters };
+  }
+
+  function tryPlaceWordPath(word, board){
+    // Find a random simple path of length word.length with no overlaps.
+    // Start at random cell, random walk with backtracking.
+    const W = word.length;
+    for(let attempt=0; attempt<1800; attempt++){
+      const start = randU32() % TOTAL;
+      const path = [];
+      const usedLocal = new Set(); // indices for this word
+      function dfs(idx, pos){
+        path.push(idx);
+        usedLocal.add(idx);
+
+        if(pos === W-1) return true;
+
+        const {r,c} = rcOf(idx);
+        const neigh = neighbors(r,c).map(p => idxOf(p.r,p.c));
+        shuffle(neigh);
+
+        for(const n of neigh){
+          if(board.used[n]) continue;
+          if(usedLocal.has(n)) continue;
+          if(dfs(n, pos+1)) return true;
+        }
+
+        usedLocal.delete(idx);
+        path.pop();
+        return false;
+      }
+
+      if(board.used[start]) continue;
+      if(dfs(start, 0)){
+        // commit
+        for(let i=0;i<path.length;i++){
+          const idx = path[i];
+          board.used[idx] = true;
+          board.letters[idx] = word[i];
+        }
+        return path;
+      }
+    }
+    return null;
+  }
+
+  function generatePuzzle(){
+    // keep trying until we build a valid full board
+    for(let attempt=0; attempt<250; attempt++){
+      const pack = pickPack();
+      const words = chooseWordsToFitGrid(pack.spangram, pack.words);
+
+      const board = emptyBoard();
+      const solutionPaths = new Map();
+
+      // Place spangram first (hardest)
+      const spPath = tryPlaceWordPath(pack.spangram, board);
+      if(!spPath) continue;
+      solutionPaths.set(pack.spangram, spPath);
+
+      // Place theme words
+      let ok = true;
+      const chosenWords = [];
+      for(const w of words){
+        const path = tryPlaceWordPath(w, board);
+        if(!path){ ok=false; break; }
+        solutionPaths.set(w, path);
+        chosenWords.push(w);
+      }
+      if(!ok) continue;
+
+      // Ensure fully filled
+      if(board.letters.some(ch => !ch)) continue;
+
+      return {
+        theme: pack.theme,
+        spangram: pack.spangram,
+        words: chosenWords,
+        gridLetters: board.letters,
+        solutionPaths
+      };
+    }
+    throw new Error("Failed to generate puzzle");
+  }
+
+  // ====== GAME LOOP ======
+  function newGame(){
+    revealed = false;
+    found = new Set();
+    clearSelection();
+
+    const seed = randU32().toString(16).toUpperCase();
+    seedEl.textContent = `Puzzle seed: ${seed}`;
+
+    puzzle = generatePuzzle();
+
+    themeTitleEl.textContent = puzzle.theme;
+    themeSubEl.textContent = `Spangram length: ${puzzle.spangram.length} • Theme words: ${puzzle.words.length}`;
+
+    buildGridDOM(puzzle.gridLetters); // IMPORTANT: grid exists BEFORE any painting
+    renderFoundList();
+    renderProgress();
+    setStatus("Ready");
+    toast("New puzzle");
+  }
+
+  function submit(){
+    if(!puzzle || selection.length < 3){
+      toast("Select at least 3 letters");
       return;
     }
-    const seg = puzzle.wordMap.get(s);
-    if(!seg){
-      // not a word
+    const guess = currentString();
+
+    // valid if equals a theme word or spangram and not already found
+    const all = new Set([puzzle.spangram, ...puzzle.words]);
+    if(!all.has(guess)){
+      setStatus("Not a word in this puzzle", "bad");
       toast("Nope");
+      return;
+    }
+    if(found.has(guess)){
+      setStatus("Already found", "warn");
+      toast("Already");
       clearSelection();
       return;
     }
 
-    // actual word in puzzle
-    const realWord = seg.word;
-    if(foundWords.has(realWord)){
-      toast("Already found");
-      clearSelection();
-      return;
-    }
-
-    foundWords.add(realWord);
-    for(const ci of seg.cells) foundCells.add(ci);
-
-    toast(realWord === puzzle.spangram ? "SPANGRAM!" : "Found");
+    markFound(guess);
+    setStatus(guess === puzzle.spangram ? "Spangram!" : "Theme word!", "ok");
+    toast(guess === puzzle.spangram ? "Spangram!" : "Theme word!");
     clearSelection();
-    renderPuzzle();
 
-    if(foundWords.size === puzzle.segments.length){
-      toast("Solved. Hit New for another.", 2200);
+    if(found.size === (1 + puzzle.words.length)){
+      setStatus("Solved!", "ok");
+      toast("Solved!", 1800);
+      revealed = true;
     }
   }
 
-  // pointer events (mouse + touch)
-  gridEl.addEventListener("pointerdown", (e) => {
-    selecting = true;
-    gridEl.setPointerCapture(e.pointerId);
-    const i = getCellFromEvent(e);
-    clearSelection();
-    addToSelection(i);
-  });
+  function reveal(){
+    if(!puzzle) return;
+    revealed = true;
 
-  gridEl.addEventListener("pointermove", (e) => {
-    if(!selecting) return;
-    const i = getCellFromEvent(e);
-    addToSelection(i);
-  });
-
-  gridEl.addEventListener("pointerup", (e) => {
-    if(!selecting) return;
-    selecting = false;
-    commitIfWord();
-  });
-
-  gridEl.addEventListener("pointercancel", () => {
-    selecting = false;
-    clearSelection();
-  });
-
-  async function newGame(){
-    foundWords.clear();
-    foundCells.clear();
-    clearSelection();
-
-    // Try multiple times for a good puzzle
-    for(let attempt=0; attempt<40; attempt++){
-      try{
-        puzzle = buildPuzzle();
-        renderPuzzle();
-        toast("New puzzle");
-        return;
-      }catch(_){}
+    // mark everything as found + paint paths
+    const all = [puzzle.spangram, ...puzzle.words];
+    for(const w of all){
+      if(!found.has(w)) markFound(w);
     }
-    throw new Error("Failed to generate puzzle (dictionary/theme issue).");
+    setStatus("Revealed", "warn");
+    toast("Revealed", 1600);
+    clearSelection();
   }
 
-  document.getElementById("home").addEventListener("click", ()=>location.href="index.html");
-  document.getElementById("new").addEventListener("click", ()=>{
-    newGame().catch(err=>{
-      console.error(err);
-      toast("Could not generate puzzle", 2000);
-    });
+  // ====== WIRE BUTTONS ======
+  document.getElementById("home").addEventListener("click", ()=> location.href="index.html");
+  document.getElementById("new").addEventListener("click", newGame);
+  document.getElementById("submit").addEventListener("click", submit);
+  document.getElementById("clear").addEventListener("click", ()=>{ clearSelection(); setStatus("Cleared"); });
+  document.getElementById("reveal").addEventListener("click", reveal);
+
+  window.addEventListener("keydown", (e)=>{
+    if(e.key === "Enter") submit();
+    if(e.key === "Escape") { clearSelection(); setStatus("Cleared"); }
   });
 
-  // init
-  (async () => {
-    try{
-      await loadDict();
-      await newGame();
-    }catch(err){
-      console.error(err);
-      loadedEl.textContent = "Failed to load dictionary";
-      toast("Dictionary load failed (use http server)", 2200);
-      themeEl.textContent = "Theme: unavailable";
-    }
-  })();
+  // ====== START ======
+  newGame();
 })();
 </script>
 </body>
