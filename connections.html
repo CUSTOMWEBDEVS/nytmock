@@ -236,12 +236,12 @@
         <div class="sideTitle">Status</div>
         <div class="meta">
           <div class="pill" id="mistakes">Mistakes remaining: 4</div>
-          <div class="pill">Loaded: offline curated (NYT-ish)</div>
+          <div class="pill">Loaded: procedural (NYT-style)</div>
           <div class="pill" id="seed"></div>
         </div>
         <div class="hint">
-          Same rules as NYT. This version aims for <b>hard but fair</b>:
-          some overlap + a couple red herrings, not “evil chaos”.
+          NYT-like rules. Unlimited replays. Categories are generated from templates + banks
+          (so you’re not manually writing hundreds of lists).
         </div>
       </div>
     </div>
@@ -259,19 +259,6 @@
     {name:"PURPLE", color:"var(--purple)"},
   ];
 
-  // Fair-hard tuning
-  const FAIR = {
-    attempts: 900,
-    // allow some ambiguity but not too many
-    minAmbiguousTiles: 3,
-    maxAmbiguousTiles: 7,
-    // require some red herrings but not a ton
-    minRedHerrings: 1,
-    maxRedHerrings: 4,
-    // avoid super obvious pattern buckets
-    maxSuffix3Clump: 3
-  };
-
   const gridEl = document.getElementById("grid");
   const solvedEl = document.getElementById("solved");
   const toastEl = document.getElementById("toast");
@@ -284,136 +271,208 @@
     clearTimeout(toast._t);
     toast._t = setTimeout(()=>toastEl.classList.remove("show"), ms);
   }
+
   function randU32(){
     const x = new Uint32Array(1);
     crypto.getRandomValues(x);
     return x[0] >>> 0;
   }
+
   function shuffle(a){
     for(let i=a.length-1;i>0;i--){
-      const j = randU32() % (i+1);
+      const j = (randU32() % (i+1));
       [a[i],a[j]] = [a[j],a[i]];
     }
+    return a;
   }
+
+  const norm = (w)=> (w||"").trim().toUpperCase();
+
+  // =========================================================
+  // Procedural "category engine"
+  //
+  // You are NOT manually writing hundreds of categories.
+  // You're defining reusable BANKS + TEMPLATES.
+  //
+  // This creates effectively infinite puzzles because each
+  // category instance is sampled (different combos each time).
+  // =========================================================
+
+  // Template bank: ___ BASE (prefixes that can go before BASE)
+  // Each base has 8-20+ options → huge combo space.
+  const PREFIX_TEMPLATES = [
+    { base:"LINE",  opts:["BASE","BOTTOM","PUNCH","SHORE","PIPE","HEAD","OUT","SIDE","GUIDE","LIFE","TIME","POWER","DEAD"] },
+    { base:"BALL",  opts:["BASE","SOFT","FOOT","BASKET","CRYSTAL","CANNON","EIGHT","MEAT","MOTH","HIGH"] },
+    { base:"CARD",  opts:["CREDIT","DEBIT","WILD","POST","ID","BIRTHDAY","CALLING","SCORE","HALLMARK","TRUMP"] },
+    { base:"CODE",  opts:["ZIP","AREA","MORSE","DRESS","SOURCE","SECRET","ERROR","ACCESS","PENAL","PASS"] },
+    { base:"LIGHT", opts:["MOON","DAY","SPOT","FLASH","HEAD","GAS","TRAFFIC","NIGHT","BRAKE","FLOOD"] },
+    { base:"WORK",  opts:["HOME","TEAM","FIELD","FRAME","NETWORK","PAPER","GROUND","SHIFT","DEAD","LINE"] },
+    { base:"SHOT",  opts:["MOON","LONG","BANK","SNAP","SCREEN","HEAD","ONE","HOT","CHEAP","FAIR"] },
+    { base:"MAP",   opts:["ROAD","MIND","HEAT","SITE","STAR","WORLD","TOPO","CONCEPT","STREET","FLOOR"] },
+    { base:"TABLE", opts:["POOL","DINING","ROUND","TIME","SIDE","DATA","PERIODIC","ALTAR","COFFEE","WORK"] },
+    { base:"FIELD", opts:["PLAYING","MINE","BATTLE","BALL","LEVEL","FAIR","FORCE","STAR","OPEN","HOME"] },
+    { base:"HOUSE", opts:["OPEN","FULL","TREE","WARE","LIGHT","DOG","COURT","POWER","SAFE","STATE"] },
+    { base:"FALL",  opts:["WATER","SNOW","SHORT","NIGHT","FREE","PIT","UP","DOWN","BASE","SPOIL"] },
+    { base:"POINT", opts:["BREAK","MATCH","TIPPING","BULLET","CHECK","VIEW","FOCAL","G","PIN","SET"] },
+    { base:"ROOM",  opts:["BATH","BED","MAIL","LEG","CLASS","BOARD","LOCKER","SHOW","WAIT","GREEN"] },
+    { base:"BANK",  opts:["RIVER","SAVINGS","PIGGY","BLOOD","FOOD","POWER","DATA","MEMORY","SNOW","SAND"] },
+    { base:"BAR",   opts:["CANDY","GRANOLA","LAW","SALAD","TIKI","SPACE","TITLE","TOOL","HANDLE","SAND"] },
+  ].map(x => ({base:norm(x.base), opts:x.opts.map(norm)}));
+
+  // Template bank: THINGS YOU CAN "VERB"
+  const VERB_TEMPLATES = [
+    { verb:"DRAW",   opts:["CARD","PICTURE","LINE","CONCLUSION","BATH","BREATH","CROWD","GUN","BLANK","SALARY","MAP","BEAD"] },
+    { verb:"CHARGE", opts:["PHONE","BATTERY","CARD","ACCOUNT","SUSPECT","BULL","ADMISSION","FEE","ROOM","ATTACK","CRIME","DRINK"] },
+    { verb:"CRACK",  opts:["EGG","JOKE","CODE","SAFE","KNUCKLES","WHIP","VOICE","SKULL","DOOR","ICE","NUT","CASE"] },
+    { verb:"FILE",   opts:["REPORT","CASE","NAIL","EDGE","COMPLAINT","CLAIM","PAPER","FORM","TAX","MOTION","PATENT","CHARGE"] },
+    { verb:"DROP",   opts:["HINT","NAME","BALL","BEAT","ANCHOR","WEIGHT","BOMB","CASE","LINE","MIC","CURTAIN","PRICE"] },
+    { verb:"RUN",    opts:["CODE","FILE","TAB","RISK","MACHINE","ERRAND","METER","CAMPAIGN","FEVER","BATH","TEST","SHOW"] },
+    { verb:"HIT",    opts:["ROAD","WALL","ROCK","BOTTOM","JACKPOT","TARGET","LIMIT","TRAIL","MARK","NOTE","SNOOZE","BOOKS"] },
+  ].map(x => ({verb:norm(x.verb), opts:x.opts.map(norm)}));
+
+  // Template bank: WORDS THAT FOLLOW "X"
+  const FOLLOW_TEMPLATES = [
+    { lead:"HOT",   opts:["DOG","WIRE","SEAT","TAKE","SHOT","LINE","SPOT","CAKE","MESS","ROD","SAUCE","TUB"] },
+    { lead:"OPEN",  opts:["MIC","BAR","HOUSE","SOURCE","SEA","MIND","FIELD","DOOR","ROAD","FIRE","BID","SLOT"] },
+    { lead:"COLD",  opts:["CALL","SHOT","FEET","SNAP","CASE","WAR","TURKEY","BLOOD","READ","SWEAT","FUSION","STORAGE"] },
+    { lead:"HIGH",  opts:["SCHOOL","NOON","ROAD","WIRE","CHAIR","FIVE","TIDE","NOTE","BAR","GROUND","RISK","TECH"] },
+    { lead:"LOW",   opts:["BLOW","ROAD","KEY","TIDE","BAR","BATTERY","PROFILE","LIGHT","BUDGET","POINT","HANGING","BROW"] },
+    { lead:"DARK",  opts:["HORSE","ROOM","MATTER","SIDE","CHOCOLATE","WEB","AGE","ENERGY","ARTS","MODE","KNIGHT","GLASS"] },
+  ].map(x => ({lead:norm(x.lead), opts:x.opts.map(norm)}));
+
+  // Synonym-ish banks (still not “categories you write every time”)
+  // Each label contains 8-16 words so each game is a different 4-of-N sample.
+  const SYNONYM_BANKS = [
+    { label:"ARGUE",      opts:["ROW","FIGHT","DEBATE","SPAR","CLASH","QUARREL","BICKER","DISPUTE","CONTEND","SQUABBLE"] },
+    { label:"LOOK",       opts:["SEE","PEEP","STARE","GLANCE","WATCH","GAPE","PEER","GANDER","EYE","OBSERVE"] },
+    { label:"END",        opts:["FINISH","CLOSE","STOP","CAP","HALT","WRAP","CONCLUDE","END","CEASE","CUT"] },
+    { label:"STEAL",      opts:["LIFT","NICK","SWIPE","ROB","TAKE","PINCH","FILCH","SNATCH","POACH","LOOT"] },
+    { label:"PRAISE",     opts:["LAUD","HAIL","APPLAUD","COMMEND","EXTOL","ADMIRE","CHEER","ACCLAIM","SALUTE","PRAISE"] },
+    { label:"HURRY",      opts:["RUSH","HASTE","SPEED","BOLT","DASH","RACE","HURRY","HUSTLE","SCURRY","ZIP"] },
+    { label:"MISTAKE",    opts:["ERROR","BLUNDER","SLIP","GAFFE","BOO-BOO","MISSTEP","FLUB","FAULT","BONER","GOOF"] },
+    { label:"SMALL",      opts:["TINY","MINI","MINUTE","PETITE","DINKY","WEE","PUNY","SLIM","NARROW","MICRO"] },
+    { label:"BIG",        opts:["HUGE","GIANT","MASSIVE","VAST","IMMENSE","ENORMOUS","GRAND","BROAD","BULKY","TITANIC"] },
+    { label:"SOUND",      opts:["RING","CHIME","CLANG","BUZZ","ROAR","HUM","RATTLE","BEEP","DING","THUD"] },
+  ].map(x => ({label:norm(x.label), opts:x.opts.map(norm)}));
+
+  // “Type of X” banks (again: sample 4-of-many each time)
+  const TYPE_BANKS = [
+    { kind:"BREAD",       opts:["RYE","PITA","NAAN","BAGUETTE","CIABATTA","SOURDOUGH","BRIOCHE","FOCACCIA","ROLL","BUN"] },
+    { kind:"DOG",         opts:["BEAGLE","POODLE","BULLDOG","HUSKY","BOXER","TERRIER","DALMATIAN","MALTESE","PUG","COLLIE"] },
+    { kind:"TREE",        opts:["OAK","MAPLE","PINE","BIRCH","ELM","CEDAR","WILLOW","SPRUCE","ASH","PALM"] },
+    { kind:"GEM",         opts:["RUBY","SAPPHIRE","EMERALD","OPAL","AMETHYST","TOPAZ","GARNET","JADE","PEARL","DIAMOND"] },
+    { kind:"WEATHER",     opts:["FOG","HAIL","SLEET","SNOW","RAIN","WIND","MIST","STORM","DRIZZLE","HEAT"] },
+    { kind:"MUSIC GENRE", opts:["JAZZ","ROCK","HIP-HOP","COUNTRY","BLUES","METAL","POP","REGGAE","FOLK","PUNK"] },
+    { kind:"DANCE",       opts:["TANGO","SALSA","WALTZ","TAP","SWING","BALLET","CHA-CHA","SAMBA","HIP-HOP","JIVE"] },
+    { kind:"SHAPE",       opts:["CIRCLE","SQUARE","TRIANGLE","OVAL","HEXAGON","OCTAGON","DIAMOND","STAR","CUBE","CONE"] },
+    { kind:"HAT",         opts:["FEDORA","BEANIE","BERET","COWBOY","TOP HAT","VISOR","CAP","BOWLER","PANAMA","TRILBY"] },
+    { kind:"BIRD",        opts:["ROBIN","EAGLE","SPARROW","CROW","GULL","HAWK","OWL","DUCK","HERON","SWAN"] },
+  ].map(x => ({kind:norm(x.kind), opts:x.opts.map(norm)}));
+
+  // Optional: wordplay-ish banks
+  const WORDPLAY_BANKS = [
+    { title:"HOMOGRAPHS", opts:["BARK","BASS","BOW","CLUB","DATE","MATCH","SEAL","FAULT","SPRING","BAT"] },
+    { title:"SILENT LETTER WORDS", opts:["KNIFE","KNEE","WRONG","PSALM","ISLAND","HONEST","WALK","DEBT","THUMB","WRECK"] },
+    { title:"COMMON EMAIL FOLDERS", opts:["INBOX","DRAFTS","SPAM","TRASH","SENT","ARCHIVE","STARRED","IMPORTANT","LABELS","OUTBOX"] },
+  ].map(x => ({title:norm(x.title), opts:x.opts.map(norm)}));
+
+  // Utility pickers
+  function pickOne(arr){ return arr[(randU32() % arr.length)]; }
   function sampleN(arr, n){
     const copy = arr.slice();
     shuffle(copy);
     return copy.slice(0, n);
   }
-  const norm = (w)=> (w||"").trim().toUpperCase();
 
-  // Curated but not “impossible”
-  // (each category has 6-10 so we can vary boards a lot)
-  const LIB = [
-    { title: "___ LINE", words: ["BASE","BOTTOM","PUNCH","SHORE","PIPE","HEADLINE","OUTLINE","SIDELINE"] },
-    { title: "___ BAR", words: ["CANDY","GRANOLA","LAW","SALAD","TIKI","SPACE","TITLE","TOOL"] },
-    { title: "THINGS YOU CAN “DRAW”", words: ["CARD","PICTURE","GUN","BATH","CONCLUSION","LINE","BREATH","CROWD"] },
-    { title: "THINGS YOU CAN “CHARGE”", words: ["PHONE","BATTERY","CARD","ACCOUNT","SUSPECT","BULL","ADMISSION","FEE"] },
-    { title: "WORDS THAT ARE ALSO VERBS", words: ["BOOK","SHIP","RING","FILE","TRACK","TABLE","FIELD","SCORE"] },
-    { title: "___ LIGHT", words: ["MOON","DAY","SPOT","FLASH","HEAD","GAS","TRAFFIC","NIGHT"] },
-    { title: "___ CODE", words: ["ZIP","AREA","MORSE","DRESS","SOURCE","SECRET","DISCOUNT","ERROR"] },
-    { title: "___ WORK", words: ["HOME","FRAME","NETWORK","PAPER","TEAM","FIELD","GUESS","NEEDLE"] },
-    { title: "___ SHOT", words: ["MOON","LONG","BANK","SNAP","SCREEN","HEAD","ONE","HOT"] },
-    { title: "___ MAP", words: ["ROAD","MIND","HEAT","SITE","STAR","CONCEPT","WORLD","TOPO"] },
-    { title: "HOMOGRAPHS", words: ["BARK","BASS","BOW","CLUB","DATE","MATCH","SEAL","FAULT"] },
-    { title: "SILENT LETTER WORDS", words: ["KNIFE","KNEE","WRONG","PSALM","ISLAND","HONEST","WALK","DEBT"] },
-    { title: "WORDS THAT FOLLOW “OPEN”", words: ["MIC","BAR","HOUSE","SOURCE","SEA","MIND","FIELD","DOOR"] },
-    { title: "WORDS THAT FOLLOW “HOT”", words: ["DOG","WIRE","SEAT","TAKE","SHOT","LINE","SPOT","CAKE"] },
-    { title: "THINGS YOU CAN “CRACK”", words: ["EGG","JOKE","CODE","SAFE","KNUCKLES","WHIP","VOICE","SKULL"] },
+  // Category instance makers (generate one group of 4 words)
+  function makePrefixCategory(){
+    const t = pickOne(PREFIX_TEMPLATES);
+    const words = sampleN(t.opts, 4);
+    return { title:`___ ${t.base}`, words };
+  }
+  function makeVerbCategory(){
+    const t = pickOne(VERB_TEMPLATES);
+    const words = sampleN(t.opts, 4);
+    return { title:`THINGS YOU CAN "${t.verb}"`, words };
+  }
+  function makeFollowCategory(){
+    const t = pickOne(FOLLOW_TEMPLATES);
+    const words = sampleN(t.opts, 4);
+    return { title:`WORDS THAT FOLLOW "${t.lead}"`, words };
+  }
+  function makeSynCategory(){
+    const b = pickOne(SYNONYM_BANKS);
+    const words = sampleN(b.opts, 4);
+    return { title:`MEAN "${b.label}"`, words };
+  }
+  function makeTypeCategory(){
+    const b = pickOne(TYPE_BANKS);
+    const words = sampleN(b.opts, 4);
+    return { title:`TYPES OF ${b.kind}`, words };
+  }
+  function makeWordplayCategory(){
+    const b = pickOne(WORDPLAY_BANKS);
+    const words = sampleN(b.opts, 4);
+    return { title:b.title, words };
+  }
+
+  // Generators by difficulty slot (NYT-ish: yellow easiest → purple trickiest)
+  const GEN_BY_SLOT = [
+    // Yellow: straightforward
+    [makeTypeCategory, makePrefixCategory],
+    // Green: slightly trickier
+    [makeVerbCategory, makeFollowCategory, makeTypeCategory],
+    // Blue: overlaps, wordplay, more “interpretation”
+    [makeVerbCategory, makeFollowCategory, makeSynCategory, makeWordplayCategory],
+    // Purple: most “NYT-ish” trick (wordplay/ambiguity)
+    [makeWordplayCategory, makeSynCategory, makeFollowCategory, makeVerbCategory],
   ];
 
-  const WORD_TO_CATS = new Map();
-  for(const cat of LIB){
-    for(const w of cat.words.map(norm)){
-      if(!WORD_TO_CATS.has(w)) WORD_TO_CATS.set(w, new Set());
-      WORD_TO_CATS.get(w).add(cat.title);
-    }
-  }
-
-  function features(w){
-    const s = w.replace(/[^A-Z]/g,"");
-    return { len:s.length, prefix3:s.slice(0,3), suffix3:s.slice(-3), dbl:/([A-Z])\1/.test(s), phrase:w.includes(" "), hyp:w.includes("-") };
-  }
-
-  function makeHerringSets(words){
-    const items = words.map(w => ({w, f: features(w)}));
-    const buckets = new Map();
-    const add = (k,w)=>{ if(!buckets.has(k)) buckets.set(k,[]); buckets.get(k).push(w); };
-
-    for(const it of items){
-      const {w,f} = it;
-      if(f.suffix3) add("S3:"+f.suffix3, w);
-      if(f.prefix3) add("P3:"+f.prefix3, w);
-      add("LEN:"+f.len, w);
-      if(f.dbl) add("DBL", w);
-      if(f.phrase) add("PHRASE", w);
-      if(f.hyp) add("HYPHEN", w);
-    }
-
-    const out = [];
-    const seen = new Set();
-    for(const [k, arr] of buckets){
-      const uniq = Array.from(new Set(arr));
-      if(uniq.length < 4) continue;
-      const pick = sampleN(uniq, 4).slice().sort();
-      const id = pick.join("|");
-      if(seen.has(id)) continue;
-      seen.add(id);
-      out.push({k, set: pick});
-    }
-    return out;
-  }
-
-  function countAmbiguous(words){
-    let n = 0;
-    for(const w of words){
-      const s = WORD_TO_CATS.get(w);
-      if(s && s.size >= 2) n++;
-    }
-    return n;
-  }
-  function maxSuffix3Clump(words){
-    const m = new Map();
-    for(const w of words){
-      const s = w.replace(/[^A-Z]/g,"");
-      const suf = s.slice(-3);
-      if(!suf) continue;
-      m.set(suf, (m.get(suf)||0)+1);
-    }
-    let best = 0;
-    for(const v of m.values()) best = Math.max(best, v);
-    return best;
-  }
-
+  // Build a puzzle: 4 groups, 16 unique words
   function generatePuzzle(seed){
-    for(let attempt=0; attempt<FAIR.attempts; attempt++){
-      const cats = sampleN(LIB, 4);
-      const chosen = cats.map(c => ({ title: c.title, words: sampleN(c.words.map(norm), 4) }));
+    // Try a bunch of times to find a clean puzzle with 16 unique tiles
+    for(let attempt=0; attempt<2000; attempt++){
+      const groups = [];
+      const used = new Set();
 
-      const all = chosen.flatMap(g => g.words);
-      if(new Set(all).size !== 16) continue;
+      for(let slot=0; slot<4; slot++){
+        let g = null;
+        for(let tries=0; tries<80; tries++){
+          const gen = pickOne(GEN_BY_SLOT[slot]);
+          const cand = gen();
+          // must be 4 unique and not already used
+          const ws = cand.words.map(norm);
+          if(new Set(ws).size !== 4) continue;
+          if(ws.some(w => used.has(w))) continue;
+          g = { title: cand.title, words: ws };
+          break;
+        }
+        if(!g){ break; }
+        g.words.forEach(w => used.add(w));
+        groups.push(g);
+      }
 
-      const amb = countAmbiguous(all);
-      if(amb < FAIR.minAmbiguousTiles || amb > FAIR.maxAmbiguousTiles) continue;
+      if(groups.length !== 4) continue;
 
-      if(maxSuffix3Clump(all) > FAIR.maxSuffix3Clump) continue;
+      const tiles = groups.flatMap(g => g.words);
+      if(new Set(tiles).size !== 16) continue;
 
-      const herrings = makeHerringSets(all);
-      const trueSets = new Set(chosen.map(g => g.words.slice().sort().join("|")));
-      const usable = herrings.filter(h => !trueSets.has(h.set.join("|")));
-      if(usable.length < FAIR.minRedHerrings || usable.length > FAIR.maxRedHerrings) continue;
+      // Light “NYT feel” check: avoid ultra-obvious boards (all single-word types only)
+      const typeCount = groups.filter(g => g.title.startsWith("TYPES OF")).length;
+      if(typeCount >= 3) continue;
 
-      const tiles = all.slice();
       shuffle(tiles);
-      return { seed, groups: chosen, tiles };
+      return { seed, groups, tiles };
     }
 
-    // fallback (always renders)
-    const cats = sampleN(LIB, 4);
-    const chosen = cats.map(c => ({ title: c.title, words: sampleN(c.words.map(norm), 4) }));
-    const tiles = chosen.flatMap(g => g.words);
-    shuffle(tiles);
-    return { seed, groups: chosen, tiles };
+    // Fallback (should be rare)
+    const g1 = makeTypeCategory();
+    const g2 = makePrefixCategory();
+    const g3 = makeVerbCategory();
+    const g4 = makeWordplayCategory();
+    const groups = [g1,g2,g3,g4].map(g => ({title:g.title, words:g.words.map(norm)}));
+    const tiles = shuffle(groups.flatMap(g => g.words)).slice(0);
+    return { seed, groups, tiles };
   }
 
   // ===== game state =====

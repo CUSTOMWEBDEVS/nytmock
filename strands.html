@@ -6,26 +6,21 @@
   <title>Strands</title>
   <style>
     :root{
-      --bg:#0b0c12;
-      --panel: rgba(255,255,255,.06);
-      --border: rgba(255,255,255,.12);
-      --text:#e9ecff;
-      --muted: rgba(233,236,255,.65);
-      --shadow: 0 18px 50px rgba(0,0,0,.45);
+      --bg:#05060a;
+      --border:rgba(255,255,255,.10);
+      --text:#eef1ff;
+      --muted:rgba(238,241,255,.68);
+      --shadow: 0 18px 50px rgba(0,0,0,.55);
 
-      --tile: rgba(255,255,255,.07);
-      --tileHover: rgba(255,255,255,.10);
-      --sel: rgba(255,255,255,.18);
-      --found: rgba(123,208,139,.22);
-      --spangram: rgba(181,140,246,.22);
+      --selFill:rgba(255,255,255,.16);
+      --selRing:rgba(255,255,255,.28);
 
-      --btn: rgba(255,255,255,.08);
-      --btnHover: rgba(255,255,255,.11);
+      --foundAlpha: .24;
+      --foundBorderAlpha: .46;
 
-      --accent:#78aef5;
-      --ok:#7bd08b;
-      --warn:#f4c64f;
-      --bad:#ff6b6b;
+      --btnBg: rgba(255,255,255,.07);
+      --btnBgHover: rgba(255,255,255,.10);
+      --btnBorder: rgba(255,255,255,.18);
     }
 
     *{box-sizing:border-box}
@@ -34,219 +29,189 @@
       margin:0;
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
       background:
-        radial-gradient(1000px 650px at 14% 10%, rgba(96,165,250,.20), transparent 60%),
-        radial-gradient(900px 650px at 86% 75%, rgba(167,139,250,.14), transparent 60%),
-        linear-gradient(180deg, #0f1020, var(--bg));
-      color: var(--text);
+        radial-gradient(900px 700px at 15% 10%, rgba(77,163,255,.10), transparent 60%),
+        radial-gradient(900px 700px at 85% 75%, rgba(181,140,246,.08), transparent 60%),
+        linear-gradient(180deg, #070812, var(--bg));
+      color:var(--text);
       display:flex;
       justify-content:center;
     }
 
-    .wrap{ width:min(1040px, 100%); padding: 0 16px 18px; }
-    header{
+    .page{ width:min(1180px, 100%); padding: 0 16px 18px; }
+
+    .nytHeader{
       height:64px;
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:10px;
       position:sticky;
       top:0;
       z-index:10;
       backdrop-filter: blur(10px);
-      background: linear-gradient(to bottom, rgba(11,12,18,.90), rgba(11,12,18,.55));
+      background: linear-gradient(to bottom, rgba(5,6,10,.92), rgba(5,6,10,.60));
       border-bottom:1px solid var(--border);
     }
-    .title{
-      font-weight: 950;
-      letter-spacing:.06em;
-      text-transform: uppercase;
-      display:flex;
-      align-items:center;
-      gap:10px;
-    }
-    .badge{
-      font-weight: 950;
-      font-size: 11px;
-      letter-spacing:.06em;
-      text-transform: uppercase;
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(0,0,0,.18);
-      color: rgba(233,236,255,.85);
-    }
-    .btn{
-      border:none;
-      border-radius: 14px;
-      padding: 12px 14px;
-      font-weight: 950;
-      cursor:pointer;
-      color:var(--text);
+    .nytLeft{ display:flex; align-items:baseline; gap:14px; min-width: 240px; }
+    .nytTitle{ font-weight: 950; font-size: 34px; line-height:1; }
+    .nytDate{ color: var(--muted); font-weight: 700; font-size: 18px; transform: translateY(2px); white-space:nowrap; }
+    .nytRight{ display:flex; align-items:center; gap:10px; min-width: 240px; justify-content:flex-end; }
+
+    .iconBtn{
+      width:40px; height:40px;
+      border-radius:999px;
+      border:1px solid var(--border);
       background: rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.12);
-      user-select:none;
+      display:grid; place-items:center;
+      cursor:pointer; user-select:none;
     }
-    .btn:hover{ background: rgba(255,255,255,.09); }
-    .btn:active{ transform: translateY(1px); }
+    .iconBtn:hover{ background: rgba(255,255,255,.09); }
+    .iconBtn:active{ transform: translateY(1px); }
+    .iconBtn svg{ opacity:.92 }
 
-    .layout{
-      margin-top: 14px;
+    .stage{
       display:grid;
-      grid-template-columns: 1fr 320px;
-      gap: 12px;
-      align-items:start;
-    }
-
-    .card{
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      box-shadow: var(--shadow);
-      padding: 14px;
-    }
-
-    .topline{
-      display:flex;
+      grid-template-columns: 1fr 520px;
+      gap: 26px;
       align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      margin-bottom: 12px;
+      padding: 26px 0 10px;
+    }
+    @media (max-width: 980px){
+      .stage{ grid-template-columns: 1fr; gap: 18px; align-items:start; }
+    }
+
+    .leftPane{ display:flex; justify-content:center; }
+    .themeCard{
+      width: min(420px, 100%);
+      border-radius: 10px;
+      overflow:hidden;
+      box-shadow: var(--shadow);
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+    }
+    .themeCardTop{
+      background: rgba(122,208,255,.28);
+      color: rgba(0,0,0,.82);
+      font-weight: 900;
+      letter-spacing:.06em;
+      text-transform: uppercase;
+      font-size: 12px;
+      padding: 10px 14px;
+      text-align:center;
+    }
+    .themeCardBody{
+      padding: 16px 14px 18px;
+      text-align:center;
+      background: rgba(0,0,0,.20);
+    }
+    .themeName{ font-weight: 900; font-size: 22px; margin: 4px 0 10px; }
+    .themeProgress{ margin-top: 8px; font-weight: 800; font-size: 18px; color: rgba(255,255,255,.92); }
+
+    .subtle{
+      margin-top: 10px;
+      color: var(--muted);
+      font-weight: 800;
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .hintRow{
+      display:flex;
+      justify-content:center;
+      gap:10px;
+      margin-top: 14px;
       flex-wrap: wrap;
     }
-    .theme{
+    .pillBtn{
+      height: 44px;
+      padding: 0 16px;
+      border-radius: 999px;
+      border: 1px solid var(--btnBorder);
+      background: var(--btnBg);
+      color: rgba(255,255,255,.92);
+      font-weight: 950;
+      cursor:pointer;
       display:flex;
-      flex-direction:column;
-      gap:6px;
-      min-width: 240px;
+      align-items:center;
+      gap:8px;
+      user-select:none;
     }
-    .theme .label{
+    .pillBtn:hover{ background: var(--btnBgHover); }
+    .pillBtn:active{ transform: translateY(1px); }
+    .pillBtn[disabled]{ opacity:.45; cursor:not-allowed; transform:none; }
+
+    .pillChip{
+      border:1px solid rgba(255,255,255,.18);
+      background: rgba(0,0,0,.22);
+      padding: 6px 10px;
+      border-radius:999px;
       font-weight: 950;
-      letter-spacing:.06em;
-      text-transform: uppercase;
+      color: rgba(255,255,255,.86);
       font-size: 12px;
-      color: rgba(233,236,255,.80);
+      white-space: nowrap;
     }
-    .theme .value{
-      font-weight: 950;
-      letter-spacing:.02em;
-      font-size: 16px;
-    }
-    .theme .sub{
+
+    .gridPane{ display:flex; justify-content:center; }
+    .gridWrap{ width:min(520px, 100%); display:flex; flex-direction:column; gap: 14px; align-items:center; }
+
+    .statusBar{
+      width: 100%;
+      max-width: 520px;
+      display:flex;
+      justify-content:space-between;
+      gap: 10px;
+      align-items:center;
       color: var(--muted);
-      font-weight: 900;
+      font-weight: 800;
       font-size: 12px;
-      line-height:1.35;
+      padding: 0 8px;
+    }
+    .pill{
+      border:1px solid var(--border);
+      background: rgba(0,0,0,.18);
+      padding: 8px 10px;
+      border-radius: 999px;
+      white-space: nowrap;
     }
 
     .grid{
       display:grid;
-      gap:10px;
-      justify-content:center;
+      gap: 14px;
       user-select:none;
       touch-action:none;
+      padding: 6px 6px;
     }
+
     .cell{
-      width: 52px;
-      height: 52px;
-      border-radius: 16px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-weight: 950;
+      width: 52px; height: 52px;
+      border-radius: 999px;
+      display:flex; align-items:center; justify-content:center;
+      font-weight: 900;
       text-transform: uppercase;
-      letter-spacing:.05em;
-      background: var(--tile);
-      border:1px solid rgba(255,255,255,.12);
+      letter-spacing: .18em;
+      padding-left: .18em;
+      background: rgba(255,255,255,0.00);
+      border: 1px solid rgba(255,255,255,0.00);
       cursor:pointer;
-      transition: transform .06s ease, background .12s ease, border-color .12s ease;
-      position:relative;
+      transition: background .12s ease, border-color .12s ease, transform .06s ease, box-shadow .12s ease;
     }
-    .cell:hover{ background: var(--tileHover); }
+    .cell:hover{
+      background: rgba(255,255,255,.05);
+      border-color: rgba(255,255,255,.06);
+    }
     .cell:active{ transform: translateY(1px); }
 
     .cell.sel{
-      background: var(--sel);
-      border-color: rgba(255,255,255,.22);
-      box-shadow: 0 0 0 2px rgba(255,255,255,.10) inset;
+      background: var(--selFill) !important;
+      border-color: var(--selRing) !important;
+      box-shadow: 0 0 0 2px rgba(255,255,255,.08) inset;
     }
-    .cell.found{
-      background: var(--found);
-      border-color: rgba(123,208,139,.32);
-    }
-    .cell.spangramFound{
-      background: var(--spangram);
-      border-color: rgba(181,140,246,.34);
-    }
-    .cell .dot{
-      position:absolute;
-      top:7px;
-      right:7px;
-      width:8px;
-      height:8px;
-      border-radius:999px;
-      background: rgba(255,255,255,.0);
-    }
-    .cell.found .dot{ background: rgba(123,208,139,.85); }
-    .cell.spangramFound .dot{ background: rgba(181,140,246,.90); }
-
-    .controls{
-      display:flex;
-      gap:10px;
-      margin-top: 12px;
-      flex-wrap: wrap;
-    }
-    .controls .btn{
-      flex: 1 1 auto;
-      text-align:center;
-      background: var(--btn);
-      border-color: rgba(255,255,255,.14);
-    }
-    .controls .btn:hover{ background: var(--btnHover); }
-
-    .sideTitle{
-      font-weight: 950;
-      letter-spacing:.05em;
-      text-transform: uppercase;
-      margin: 0 0 10px;
-      opacity:.95;
-    }
-
-    .pill{
-      padding: 10px 12px;
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(0,0,0,.18);
-      color: rgba(233,236,255,.82);
-      font-weight: 900;
-      font-size: 12px;
-      margin-bottom: 10px;
-    }
-
-    .foundList{
-      display:flex;
-      flex-wrap: wrap;
-      gap:8px;
-    }
-    .chip{
-      padding: 8px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(0,0,0,.18);
-      font-weight: 950;
-      font-size: 12px;
-      letter-spacing:.03em;
-      text-transform: uppercase;
-      color: rgba(233,236,255,.86);
-    }
-    .chip.sp{ border-color: rgba(181,140,246,.35); background: rgba(181,140,246,.14); }
-    .chip.th{ border-color: rgba(123,208,139,.35); background: rgba(123,208,139,.14); }
 
     .toast{
       position:fixed;
-      top:74px;
+      top:76px;
       left:50%;
       transform:translateX(-50%);
-      background: rgba(0,0,0,.42);
+      background: rgba(0,0,0,.55);
       border:1px solid rgba(255,255,255,.14);
       border-radius: 999px;
       padding: 10px 14px;
@@ -263,55 +228,105 @@
     }
     .toast.show{ opacity:1; }
 
-    @media (max-width: 980px){
-      .layout{ grid-template-columns: 1fr; }
-      .cell{ width: 48px; height: 48px; }
+    .modalBackdrop{
+      position:fixed;
+      inset:0;
+      background: rgba(0,0,0,.55);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index: 10000;
+      backdrop-filter: blur(8px);
     }
+    .modalBackdrop.show{ display:flex; }
+    .modal{
+      width: min(420px, calc(100% - 28px));
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(10,12,20,.92);
+      box-shadow: 0 22px 70px rgba(0,0,0,.70);
+      padding: 16px 16px 14px;
+      text-align:center;
+    }
+    .modalTitle{
+      font-weight: 950;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      font-size: 14px;
+      color: rgba(255,255,255,.92);
+    }
+    .modalMsg{
+      margin-top: 10px;
+      font-weight: 900;
+      font-size: 22px;
+      letter-spacing:.01em;
+    }
+    .modalBtnRow{ margin-top: 14px; display:flex; justify-content:center; }
+    .modalBtn{
+      width: 140px; height: 44px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(255,255,255,.08);
+      color: rgba(255,255,255,.92);
+      font-weight: 950;
+      cursor:pointer;
+    }
+    .modalBtn:hover{ background: rgba(255,255,255,.11); }
+    .modalBtn:active{ transform: translateY(1px); }
   </style>
 </head>
+
 <body>
-  <div class="wrap">
-    <header>
-      <button class="btn" id="home">⌂ Home</button>
-      <div class="title">
-        <span>Strands</span>
-        <span class="badge" id="badge">Spangram + Theme</span>
+  <div class="page">
+    <div class="nytHeader">
+      <div class="nytLeft">
+        <div class="nytTitle">Strands</div>
+        <div class="nytDate" id="dateLabel">January 14, 2026</div>
       </div>
-      <button class="btn" id="new">New</button>
-    </header>
 
-    <div class="layout">
-      <div class="card">
-        <div class="topline">
-          <div class="theme">
-            <div class="label">Theme</div>
-            <div class="value" id="themeTitle">Loading…</div>
-            <div class="sub" id="themeSub">Find the spangram, then the theme words.</div>
+      <div class="nytRight">
+        <div class="iconBtn" title="New puzzle" id="newBtn" aria-label="New puzzle">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M21 12a9 9 0 1 1-2.64-6.36" stroke="white" stroke-width="2" stroke-linecap="round"/>
+            <path d="M21 3v7h-7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="stage">
+      <div class="leftPane">
+        <div style="width:min(420px,100%);">
+          <div class="themeCard">
+            <div class="themeCardTop">TODAY'S THEME</div>
+            <div class="themeCardBody">
+              <div class="themeName" id="themeTitle">Loading…</div>
+              <div class="themeProgress" id="themeProgress">0 of 6 theme words found.</div>
+
+              <div class="hintRow">
+                <button class="pillBtn" id="hintBtn" disabled>
+                  Hint
+                  <span class="pillChip" id="hintChip">Credits: 0 • Hints left: 3</span>
+                </button>
+              </div>
+
+              <div class="subtle" id="dictStatus">Dictionary: initializing…</div>
+              <div class="subtle">
+                Find bonus words (real English words) to earn hint credits. Max 3 credits, max 3 hints.
+              </div>
+            </div>
           </div>
-          <div class="pill" id="status">Ready</div>
-        </div>
-
-        <div class="grid" id="grid"></div>
-
-        <div class="controls">
-          <button class="btn" id="submit">Submit</button>
-          <button class="btn" id="clear">Clear</button>
-          <button class="btn" id="reveal">Reveal</button>
         </div>
       </div>
 
-      <div class="card">
-        <div class="sideTitle">Found</div>
-        <div class="pill" id="seed"></div>
-        <div class="pill" id="progress"></div>
-        <div class="foundList" id="foundList"></div>
-        <div style="height:10px"></div>
-        <div class="pill" style="color:rgba(233,236,255,.75); line-height:1.45;">
-          Controls:
-          <br/>• Click / drag to select adjacent letters (8 directions)
-          <br/>• Submit to check a word
-          <br/>• Clear cancels current selection
-          <br/>• Reveal shows all answers for this board
+      <div class="gridPane">
+        <div class="gridWrap">
+          <div class="statusBar">
+            <div class="pill" id="seedPill">Seed: —</div>
+            <div class="pill" id="statusPill">Drag letters to form words</div>
+          </div>
+
+          <div class="grid" id="grid"></div>
         </div>
       </div>
     </div>
@@ -319,73 +334,65 @@
 
   <div class="toast" id="toast"></div>
 
+  <div class="modalBackdrop" id="modalBackdrop" role="dialog" aria-modal="true">
+    <div class="modal">
+      <div class="modalTitle">Achievement</div>
+      <div class="modalMsg">SPANGRAM FOUND!</div>
+      <div class="modalBtnRow">
+        <button class="modalBtn" id="modalOk">OK</button>
+      </div>
+    </div>
+  </div>
+
 <script>
 (() => {
-  // ====== CONFIG ======
+  // =========================
+  // CONFIG (Option B)
+  // =========================
+  // Real English word list hosted online.
+  // This file is ~370k words and works well for bonus words like MAIL/LONE/etc.
+  // If you want a different source, replace DICT_URL with another newline-separated word list.
+  const DICT_URL = "https://raw.githubusercontent.com/dwyl/english-words/master/words_alpha.txt";
+  const DICT_VERSION = "dwyl_words_alpha_v1"; // bump this to force cache refresh
+
+  // =========================
+  // GAME CONSTANTS
+  // =========================
   const ROWS = 8;
   const COLS = 6;
   const TOTAL = ROWS * COLS;
 
-  // Theme packs. Each one has:
-  // - theme title
-  // - spangram (1 long phrase-ish string, letters only)
-  // - theme words (multiple, letters only)
-  //
-  // The generator *builds the grid from these letters*, then hides the paths.
-  const PACKS = [
-    {
-      theme: "COFFEE ORDER",
-      spangram: "COFFEEHOUSEMENU",
-      words: ["LATTE","MOCHA","ESPRESSO","AMERICANO","CAPPUCCINO","MACCHIATO"]
-    },
-    {
-      theme: "MOVIE NIGHT",
-      spangram: "POPCORNMOVIETIME",
-      words: ["TRAILER","TICKETS","CINEMA","SCREEN","SUBTITLES","SEQUEL"]
-    },
-    {
-      theme: "GAME DEV",
-      spangram: "BUILDINGGAMEENGINE",
-      words: ["SHADER","TEXTURE","MESH","PHYSICS","CAMERA","SPRITE"]
-    },
-    {
-      theme: "MUSIC GEAR",
-      spangram: "STUDIORECORDINGKIT",
-      words: ["MIC","CABLE","MIXER","TRACKS","HEADPHONES","AMPLIFIER"]
-    },
-    {
-      theme: "ROAD TRIP",
-      spangram: "HIGHWAYVACATIONPLAN",
-      words: ["MOTEL","MAPS","SNACKS","GAS","MILEAGE","DET0UR".replace("0","O")]
-    },
-    {
-      theme: "KITCHEN TIME",
-      spangram: "COOKINGANDMEALPREP",
-      words: ["SKILLET","SPATULA","RECIPE","CHOP","BOIL","BAKE"]
-    },
-    {
-      theme: "TECH WORDS",
-      spangram: "INTERNETPROTOCOLS",
-      words: ["ROUTER","PACKET","DOMAIN","SERVER","CLIENT","LATENCY"]
-    },
-    {
-      theme: "HARDWARE",
-      spangram: "COMPUTERPARTSBUILD",
-      words: ["GPU","CPU","RAM","DRIVE","FANS","CASE"]
-    },
-  ];
+  const THEME_WORD_COUNT = 6;
 
-  // ====== DOM ======
+  const MAX_HINTS = 3;
+  const MAX_CREDITS = 3;
+  const MIN_BONUS_LEN = 4;
+
+  const WORD_PALETTE = [
+    "#7BD08B", "#78AEF5", "#F4C64F", "#FF8A65",
+    "#4DD0E1", "#AED581", "#CE93D8", "#FFB74D",
+    "#64B5F6", "#BA68C8", "#81C784", "#FFD54F"
+  ];
+  const SPANGRAM_COLOR = "#B58CF6";
+
+  // =========================
+  // DOM
+  // =========================
   const gridEl = document.getElementById("grid");
   const toastEl = document.getElementById("toast");
-  const statusEl = document.getElementById("status");
   const themeTitleEl = document.getElementById("themeTitle");
-  const themeSubEl = document.getElementById("themeSub");
-  const seedEl = document.getElementById("seed");
-  const progressEl = document.getElementById("progress");
-  const foundListEl = document.getElementById("foundList");
+  const themeProgressEl = document.getElementById("themeProgress");
+  const statusPill = document.getElementById("statusPill");
+  const seedPill = document.getElementById("seedPill");
+  const hintBtn = document.getElementById("hintBtn");
+  const hintChip = document.getElementById("hintChip");
+  const dictStatus = document.getElementById("dictStatus");
 
-  // ====== UTILS ======
+  const modalBackdrop = document.getElementById("modalBackdrop");
+  const modalOk = document.getElementById("modalOk");
+  modalOk.onclick = () => modalBackdrop.classList.remove("show");
+  modalBackdrop.onclick = (e) => { if(e.target === modalBackdrop) modalBackdrop.classList.remove("show"); };
+
   function toast(msg, ms=1400){
     toastEl.textContent = msg;
     toastEl.classList.add("show");
@@ -403,46 +410,362 @@
       const j = randU32() % (i+1);
       [a[i],a[j]] = [a[j],a[i]];
     }
+    return a;
   }
-  function lettersOnly(s){
-    return (s||"").toUpperCase().replace(/[^A-Z]/g,"");
-  }
-  function key(r,c){ return r + "," + c; }
-  function inBounds(r,c){ return r>=0 && r<ROWS && c>=0 && c<COLS; }
+  function pickOne(arr){ return arr[randU32() % arr.length]; }
+  function toLettersOnly(s){ return (s||"").toUpperCase().replace(/[^A-Z]/g,""); }
 
-  function neighbors(r,c){
+  function idxOf(r,c){ return r*COLS + c; }
+  function rcOf(idx){ return { r: Math.floor(idx/COLS), c: idx % COLS }; }
+  function inBounds(r,c){ return r>=0 && r<ROWS && c>=0 && c<COLS; }
+  function neighborsIdx(idx){
+    const {r,c} = rcOf(idx);
     const out = [];
     for(let dr=-1; dr<=1; dr++){
       for(let dc=-1; dc<=1; dc++){
         if(dr===0 && dc===0) continue;
-        const rr = r+dr, cc=c+dc;
-        if(inBounds(rr,cc)) out.push({r:rr,c:cc});
+        const rr=r+dr, cc=c+dc;
+        if(inBounds(rr,cc)) out.push(idxOf(rr,cc));
       }
     }
     return out;
   }
-
-  function idxOf(r,c){ return r*COLS + c; }
-  function rcOf(idx){ return { r: Math.floor(idx/COLS), c: idx % COLS }; }
-
-  function setStatus(msg, type=""){
-    statusEl.textContent = msg;
-    statusEl.style.color =
-      type==="ok" ? "var(--ok)" :
-      type==="warn" ? "var(--warn)" :
-      type==="bad" ? "var(--bad)" :
-      "rgba(233,236,255,.82)";
+  function isAdjacent(a,b){
+    const A=rcOf(a), B=rcOf(b);
+    return Math.abs(A.r-B.r)<=1 && Math.abs(A.c-B.c)<=1 && !(A.r===B.r && A.c===B.c);
   }
 
-  // ====== GAME STATE ======
-  let puzzle = null;        // {theme, spangram, words, gridLetters[], solutionPaths: Map(word->cells[]) }
-  let cells = [];           // DOM cell elements indexed by idx
-  let selecting = false;
-  let selection = [];       // array of idx
-  let found = new Set();    // found words (including spangram)
-  let revealed = false;
+  function rgba(hex, alpha){
+    const h = hex.replace("#","");
+    const r = parseInt(h.slice(0,2), 16);
+    const g = parseInt(h.slice(2,4), 16);
+    const b = parseInt(h.slice(4,6), 16);
+    return `rgba(${r},${g},${b},${alpha})`;
+  }
 
-  // ====== RENDER GRID ======
+  // =========================
+  // IndexedDB cache for bloom
+  // =========================
+  const IDB_DB = "strands_dict_cache";
+  const IDB_STORE = "bloom";
+  function idbOpen(){
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open(IDB_DB, 1);
+      req.onupgradeneeded = () => {
+        const db = req.result;
+        if(!db.objectStoreNames.contains(IDB_STORE)) db.createObjectStore(IDB_STORE);
+      };
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  }
+  async function idbGet(key){
+    const db = await idbOpen();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(IDB_STORE, "readonly");
+      const store = tx.objectStore(IDB_STORE);
+      const req = store.get(key);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  }
+  async function idbSet(key, value){
+    const db = await idbOpen();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(IDB_STORE, "readwrite");
+      const store = tx.objectStore(IDB_STORE);
+      const req = store.put(value, key);
+      req.onsuccess = () => resolve(true);
+      req.onerror = () => reject(req.error);
+    });
+  }
+
+  // =========================
+  // Bloom filter in Worker
+  // =========================
+  // We build a bloom filter so we can check "real word" fast without holding a huge Set in memory.
+  let dictBloom = null; // { bits: Uint8Array, m:number, k:number, n:number }
+  let dictReady = false;
+
+  function bloomHas(bloom, w){
+    const {bits, m, k} = bloom;
+    const h1 = fnv1a32(w, 0x811C9DC5);
+    const h2 = (fnv1a32(w, 0x9E3779B9) | 1) >>> 0;
+    for(let i=0;i<k;i++){
+      const idx = (h1 + Math.imul(i, h2)) >>> 0;
+      const bit = idx % m;
+      if((bits[bit >>> 3] & (1 << (bit & 7))) === 0) return false;
+    }
+    return true;
+  }
+
+  // FNV-1a 32bit (shared)
+  function fnv1a32(str, seed=0x811C9DC5){
+    let h = (seed >>> 0);
+    for(let i=0;i<str.length;i++){
+      h ^= str.charCodeAt(i);
+      h = Math.imul(h, 0x01000193) >>> 0;
+    }
+    return h >>> 0;
+  }
+
+  function isRealWord(w){
+    if(!dictReady || !dictBloom) return false;
+    return bloomHas(dictBloom, w);
+  }
+
+  function makeWorker(){
+    const workerCode = `
+      function fnv1a32(str, seed){
+        let h = (seed >>> 0);
+        for(let i=0;i<str.length;i++){
+          h ^= str.charCodeAt(i);
+          h = Math.imul(h, 0x01000193) >>> 0;
+        }
+        return h >>> 0;
+      }
+      function setBit(bits, i){
+        bits[i >>> 3] |= (1 << (i & 7));
+      }
+
+      self.onmessage = (e) => {
+        const { text, bitsPerWord, k } = e.data;
+        const lines = text.split(/\\r?\\n/);
+        const words = [];
+        for(const line of lines){
+          const w = (line||"").trim().toUpperCase().replace(/[^A-Z]/g,"");
+          if(w.length >= 3) words.push(w);
+        }
+        const n = words.length;
+        const m = Math.max(1_000_000, n * bitsPerWord);
+        const bits = new Uint8Array(Math.ceil(m/8));
+
+        // build bloom
+        for(let wi=0; wi<n; wi++){
+          const w = words[wi];
+          const h1 = fnv1a32(w, 0x811C9DC5);
+          const h2 = (fnv1a32(w, 0x9E3779B9) | 1) >>> 0;
+          for(let i=0;i<k;i++){
+            const idx = (h1 + Math.imul(i, h2)) >>> 0;
+            setBit(bits, idx % m);
+          }
+          // light progress updates
+          if((wi % 50000) === 0 && wi !== 0){
+            self.postMessage({ type: "progress", done: wi, total: n });
+          }
+        }
+
+        self.postMessage({ type: "done", n, m, k, bits: bits.buffer }, [bits.buffer]);
+      };
+    `;
+    const blob = new Blob([workerCode], {type:"text/javascript"});
+    const url = URL.createObjectURL(blob);
+    const w = new Worker(url);
+    w._blobUrl = url;
+    return w;
+  }
+
+  async function initDictionary(){
+    dictStatus.textContent = "Dictionary: checking cache…";
+    // 1) try cache
+    try{
+      const cached = await idbGet(DICT_VERSION);
+      if(cached && cached.m && cached.k && cached.n && cached.bits){
+        dictBloom = {
+          m: cached.m,
+          k: cached.k,
+          n: cached.n,
+          bits: new Uint8Array(cached.bits)
+        };
+        dictReady = true;
+        dictStatus.textContent = `Dictionary: ready (cached • ${dictBloom.n.toLocaleString()} words)`;
+        return;
+      }
+    }catch(_) {}
+
+    // 2) fetch
+    dictStatus.textContent = "Dictionary: downloading…";
+    let text;
+    try{
+      const res = await fetch(DICT_URL, { cache: "force-cache" });
+      if(!res.ok) throw new Error("Download failed");
+      text = await res.text();
+    }catch(err){
+      dictReady = false;
+      dictBloom = null;
+      dictStatus.textContent = "Dictionary: unavailable (offline / blocked). Bonus words won’t give credits.";
+      return;
+    }
+
+    // 3) build in worker
+    dictStatus.textContent = "Dictionary: building…";
+    const worker = makeWorker();
+    const bitsPerWord = 10;
+    const k = 7;
+
+    const done = await new Promise((resolve, reject) => {
+      worker.onmessage = (e) => {
+        const msg = e.data;
+        if(msg.type === "progress"){
+          dictStatus.textContent = `Dictionary: building… (${msg.done.toLocaleString()}/${msg.total.toLocaleString()})`;
+        } else if(msg.type === "done"){
+          resolve(msg);
+        }
+      };
+      worker.onerror = (e) => reject(e?.message || e);
+      worker.postMessage({ text, bitsPerWord, k });
+    }).catch(err => {
+      try{ worker.terminate(); URL.revokeObjectURL(worker._blobUrl); }catch(_){}
+      throw err;
+    });
+
+    try{ worker.terminate(); URL.revokeObjectURL(worker._blobUrl); }catch(_){}
+
+    dictBloom = { m: done.m, k: done.k, n: done.n, bits: new Uint8Array(done.bits) };
+    dictReady = true;
+    dictStatus.textContent = `Dictionary: ready (${dictBloom.n.toLocaleString()} words)`;
+
+    // 4) store cache
+    try{
+      await idbSet(DICT_VERSION, { m: dictBloom.m, k: dictBloom.k, n: dictBloom.n, bits: dictBloom.bits.buffer });
+      // keep a small marker too if you want
+    }catch(_){}
+  }
+
+  // =========================
+  // Theme bank (THOUSANDS + deck)
+  // =========================
+  function makeSpangramCandidates(label){
+    const base = toLettersOnly(label);
+    const cands = [
+      "THEME" + base,
+      base + "PUZZLE",
+      base + "WORDSEARCH",
+      "ALL" + base,
+      base + "COLLECTION"
+    ].map(toLettersOnly);
+
+    const good = cands.filter(s => s.length >= 14 && s.length <= 22);
+    if(good.length) return good.slice(0,3);
+
+    let best = cands.sort((a,b)=> Math.abs(a.length-18) - Math.abs(b.length-18))[0] || (base + "PUZZLE");
+    if(best.length > 22) best = best.slice(0,22);
+    while(best.length < 14) best += best[best.length-1] || "A";
+    return [best];
+  }
+  function makeBank(label, words){
+    const cleaned = Array.from(new Set(words.map(toLettersOnly).filter(Boolean)));
+    return { label, spangrams: makeSpangramCandidates(label), words: cleaned };
+  }
+
+  const BANK_SPECS = [
+    ["MOVIE NIGHT", ["TRAILER","TICKETS","CINEMA","SCREEN","SUBTITLES","SEQUEL","PREQUEL","DIRECTOR","CAMEO","CREDITS","POPCORN","PROJECTOR"]],
+    ["COFFEE ORDER", ["LATTE","MOCHA","ESPRESSO","AMERICANO","CAPPUCCINO","MACCHIATO","CORTADO","AFFOGATO","RISTRETTO","BREVE","FLATWHITE","ICEDCOFFEE"]],
+    ["GAME DEV", ["SHADER","TEXTURE","PHYSICS","CAMERA","SPRITE","COLLIDER","ANIMATION","LIGHTING","AUDIO","SCENE","EDITOR","MESH"]],
+    ["MUSIC TERMS", ["CHORD","SCALE","TEMPO","VERSE","CHORUS","BRIDGE","HARMONY","MELODY","RHYTHM","LYRICS","METER","KEY"]],
+    ["TOOLS", ["HAMMER","WRENCH","SCREWDRIVER","PLIERS","LEVEL","DRILL","SAW","TAPE","CHISEL","CLAMP","BOLTS","NAILS"]],
+    ["WEATHER", ["RAIN","SNOW","HAIL","SLEET","FOG","WIND","DROUGHT","THUNDER","LIGHTNING","HUMIDITY","DRIZZLE","BLIZZARD"]],
+    ["KITCHEN TOOLS", ["SKILLET","SPATULA","WHISK","LADLE","PEELER","GRATER","TONGS","SPOON","KNIFE","CUTTINGBOARD","COLANDER","MEASURINGCUP"]],
+    ["ROAD TRIP", ["MOTEL","MAPS","SNACKS","MILEAGE","DETOUR","RESTSTOP","TOLLS","SUITCASE","PLAYLIST","COOLER","SOUVENIR","GAS"]],
+    ["OFFICE STUFF", ["INBOX","CALENDAR","MEETING","NOTES","PRINTER","BADGE","SPREADSHEET","EMAIL","DEADLINE","AGENDA","CHECKLIST","REMINDER"]],
+    ["PHOTO BASICS", ["LENS","TRIPOD","FLASH","SHUTTER","APERTURE","FILTER","BATTERY","BACKDROP","REFLECTOR","FOCUS","FRAME","ISO"]],
+    ["CLEANING", ["VACUUM","MOP","DUST","SPONGE","SOAP","BUCKET","RAG","BROOM","SPRAY","BLEACH","GLOVES","LAUNDRY"]],
+    ["OUTDOORS", ["TENT","HIKING","COMPASS","LANTERN","MATCHES","BACKPACK","TRAIL","RIVER","SUMMIT","FIREPIT","SLEEPINGBAG","MAP"]],
+    ["SHOPPING", ["AISLE","COUPON","CART","BAG","RECEIPT","CHECKOUT","BRAND","BARGAIN","STOCK","SALE","SHELF","LIST"]],
+    ["COMPUTER BUILD", ["GPU","CPU","RAM","DRIVE","FANS","CASE","COOLER","MOTHERBOARD","PSU","MONITOR","KEYBOARD","MOUSE"]],
+  ];
+
+  const SETS = {
+    FRUITS: ["APPLE","BANANA","ORANGE","MANGO","PAPAYA","PEACH","PEAR","GRAPE","PLUM","CHERRY","LEMON","LIME"],
+    VEGETABLES: ["CARROT","CELERY","ONION","GARLIC","PEPPER","TOMATO","POTATO","SPINACH","BROCCOLI","CUCUMBER","SQUASH","BEET"],
+    ANIMALS: ["TIGER","ZEBRA","HORSE","RABBIT","MONKEY","PANDA","OTTER","WHALE","DOLPHIN","EAGLE","FALCON","SNAKE"],
+    COLORS: ["PURPLE","YELLOW","ORANGE","GREEN","INDIGO","VIOLET","SCARLET","CRIMSON","SILVER","GOLD","CYAN","MAGENTA"],
+    CLOTHING: ["JACKET","HOODIE","SWEATER","SCARF","GLOVES","BOOTS","SNEAKERS","JEANS","SHORTS","DRESS","SKIRT","BELT"],
+    SPORTS: ["SOCCER","BASEBALL","HOCKEY","TENNIS","GOLF","BOXING","RUGBY","CRICKET","SKIING","SKATING","CYCLING","RUNNING"],
+    EMOTIONS: ["HAPPY","SAD","ANGRY","PROUD","AFRAID","BRAVE","NERVOUS","CALM","GRATEFUL","JEALOUS","LONELY","EXCITED"],
+    SPACE: ["PLANET","COMET","ORBIT","GALAXY","NEBULA","ASTEROID","COSMOS","ROCKET","SATELLITE","TELESCOPE","STARLIGHT","MOONLIGHT"],
+    MUSIC_GEAR: ["MIC","CABLE","MIXER","PEDAL","STAND","TUNER","INTERFACE","MONITOR","AMPLIFIER","HEADPHONES","SPEAKERS","METRONOME"],
+    WEB_DEV: ["HTML","CSS","JAVASCRIPT","SERVER","CLIENT","COOKIE","CACHE","ROUTER","DOMAIN","LATENCY","FIREWALL","SOCKET"],
+    DRINKS: ["SODA","JUICE","WATER","COCOA","TEA","LATTE","MOCHA","LEMONADE","SMOOTHIE","KOMBUCHA","ESPRESSO","MILKSHAKE"],
+    HOBBIES: ["DRAWING","PAINTING","FISHING","HUNTING","GAMING","READING","HIKING","COOKING","GARDENING","RUNNING","SKATING","CAMPING"],
+    TRANSPORT: ["TRAIN","PLANE","FERRY","TAXI","TRUCK","SCOOTER","BICYCLE","SUBWAY","MOTORBIKE","SHIP","BUS","CAR"],
+    HOUSE: ["KITCHEN","GARAGE","BEDROOM","BATHROOM","HALLWAY","BASEMENT","ATTIC","PATIO","PORCH","OFFICE","DININGROOM","LAUNDRYROOM"],
+    SCHOOL: ["PENCIL","ERASER","RULER","BACKPACK","NOTEBOOK","TEXTBOOK","HOMEWORK","LECTURE","EXAM","QUIZ","RECESS","LAB"],
+    DESSERTS: ["COOKIE","BROWNIE","CUPCAKE","PIE","ICECREAM","PUDDING","MUFFIN","DONUT","TART","WAFFLE","PANCAKE","CHEESECAKE"],
+    BREAKFAST: ["BACON","EGGS","TOAST","OATMEAL","CEREAL","PANCAKE","WAFFLE","SAUSAGE","YOGURT","GRANOLA","COFFEE","JUICE"],
+    NATURE: ["FOREST","RIVER","MOUNTAIN","VALLEY","DESERT","OCEAN","LAKE","CANYON","WATERFALL","MEADOW","GLACIER","VOLCANO"],
+    GAMES: ["CHESS","CHECKERS","SCRABBLE","DARTS","BOWLING","CARDS","DOMINOES","POKER","UNO","MAHJONG","BILLIARDS","PUZZLE"],
+    TECH: ["ROUTER","PACKET","DOMAIN","SERVER","CLIENT","LATENCY","FIREWALL","SOCKET","BANDWIDTH","PORT","CACHE","COOKIE"],
+    HEALTH: ["SLEEP","WATER","WALKING","STRETCH","POSTURE","BREATH","CALCIUM","PROTEIN","CARDIO","BALANCE","RECOVERY","MOBILITY"],
+    FESTIVAL: ["TICKETS","LINEUP","STAGE","VENDOR","WRISTBAND","HEADLINER","ENCORE","MERCH","SOUNDCHECK","BACKSTAGE","SETLIST","SPOTLIGHT"],
+    SHOP: ["AISLE","COUPON","CART","BAG","RECEIPT","BRAND","BARGAIN","STOCK","SALE","SHELF","CHECKOUT","LIST"],
+    COOK: ["CHOP","SLICE","DICE","BOIL","BAKE","ROAST","FRY","GRILL","SAUTE","SIMMER","WHISK","MIX"],
+  };
+
+  const TOPICS = Object.keys(SETS);
+  const PREFIXES = ["", "CLASSIC ", "EVERYDAY ", "ULTIMATE ", "BASIC ", "FAVORITE ", "TOP ", "FUN ", "QUICK "];
+  const SUFFIXES = ["", " BASICS", " LIST", " SET", " PICKS", " FAVORITES", " 101", " PACK", " ROUNDUP"];
+
+  const THEME_BANKS = [];
+  for(const [label, words] of BANK_SPECS) THEME_BANKS.push(makeBank(label, words));
+  for(const topic of TOPICS){
+    const baseWords = SETS[topic];
+    for(const pre of PREFIXES){
+      for(const suf of SUFFIXES){
+        const label = (pre + topic.replace(/_/g," ") + suf).trim().replace(/\s+/g," ");
+        THEME_BANKS.push(makeBank(label, baseWords));
+      }
+    }
+  }
+  // De-dup labels
+  const dedup = new Map();
+  for(const b of THEME_BANKS){
+    if(!dedup.has(b.label)) dedup.set(b.label, b);
+  }
+  const BANKS = Array.from(dedup.values());
+
+  // Deck so you don't repeat themes until you exhaust all
+  let bankDeck = [];
+  let bankDeckPos = 0;
+  function reshuffleDeck(){
+    bankDeck = Array.from({length: BANKS.length}, (_,i)=>i);
+    shuffle(bankDeck);
+    bankDeckPos = 0;
+  }
+  reshuffleDeck();
+  function nextBank(){
+    if(bankDeckPos >= bankDeck.length) reshuffleDeck();
+    return BANKS[ bankDeck[bankDeckPos++] ];
+  }
+
+  // =========================
+  // Game state
+  // =========================
+  let puzzle = null; // {theme, spangram, words, gridLetters, solutionPaths}
+  let cells = [];
+  let selection = [];
+  let foundTheme = new Set();
+  let foundSpangram = false;
+  let foundWordColors = new Map();
+
+  let dragging = false;
+  let activePointerId = null;
+
+  let hintCredits = 0;
+  let hintsUsed = 0;
+  let hinted = new Set();
+  let bonusFound = new Set();
+
+  function updateThemeUI(){
+    themeTitleEl.textContent = puzzle?.theme || "—";
+    themeProgressEl.textContent = `${foundTheme.size} of ${THEME_WORD_COUNT} theme words found.`;
+    hintChip.textContent = `Credits: ${hintCredits} • Hints left: ${Math.max(0, MAX_HINTS - hintsUsed)}`;
+    hintBtn.disabled = !(hintCredits > 0 && hintsUsed < MAX_HINTS);
+  }
+
+  // =========================
+  // Grid / selection
+  // =========================
   function buildGridDOM(letters){
     gridEl.innerHTML = "";
     gridEl.style.gridTemplateColumns = `repeat(${COLS}, 52px)`;
@@ -450,249 +773,178 @@
     cells = new Array(TOTAL);
 
     for(let i=0;i<TOTAL;i++){
-      const {r,c} = rcOf(i);
       const el = document.createElement("div");
       el.className = "cell";
-      el.id = `cell-${r}-${c}`;
       el.dataset.idx = String(i);
       el.textContent = letters[i] || "?";
-      const dot = document.createElement("div");
-      dot.className = "dot";
-      el.appendChild(dot);
-
-      el.addEventListener("pointerdown", (e)=>{
-        e.preventDefault();
-        if(revealed) return;
-        selecting = true;
-        startOrExtendSelection(i);
-        el.setPointerCapture?.(e.pointerId);
-      });
-      el.addEventListener("pointerenter", ()=>{
-        if(!selecting || revealed) return;
-        startOrExtendSelection(i);
-      });
-
       cells[i] = el;
       gridEl.appendChild(el);
     }
 
-    window.addEventListener("pointerup", ()=>{ selecting=false; }, { once:false });
+    gridEl.onpointerdown = (e) => {
+      const cell = e.target.closest?.(".cell");
+      if(!cell) return;
+
+      e.preventDefault();
+      dragging = true;
+      activePointerId = e.pointerId;
+
+      clearSelectionVisual();
+      addToSelection(Number(cell.dataset.idx));
+      statusPill.textContent = currentString() || "Drag letters to form word";
+
+      window.addEventListener("pointermove", onPointerMove, { passive:false });
+      window.addEventListener("pointerup", onPointerUp, { passive:false });
+      window.addEventListener("pointercancel", onPointerUp, { passive:false });
+    };
   }
 
-  function cellElByIdx(i){ return cells[i]; }
+  function onPointerMove(e){
+    if(!dragging) return;
+    if(activePointerId !== null && e.pointerId !== activePointerId) return;
+    e.preventDefault();
 
-  // ====== SAFE PAINT (this prevents your crash) ======
+    const el = document.elementFromPoint(e.clientX, e.clientY);
+    const cell = el?.closest?.(".cell");
+    if(!cell) return;
+
+    extendSelection(Number(cell.dataset.idx));
+    statusPill.textContent = currentString() || "Drag letters to form word";
+  }
+
+  function onPointerUp(e){
+    if(!dragging) return;
+    if(activePointerId !== null && e.pointerId !== activePointerId) return;
+    e.preventDefault();
+
+    dragging = false;
+    activePointerId = null;
+
+    window.removeEventListener("pointermove", onPointerMove);
+    window.removeEventListener("pointerup", onPointerUp);
+    window.removeEventListener("pointercancel", onPointerUp);
+
+    autoSubmitSelection();
+  }
+
   function paintCells(idxs, addClass, removeClasses=[]){
-    if(!Array.isArray(idxs)) return;
     for(const i of idxs){
-      const el = cellElByIdx(i);
-      if(!el) continue; // <- critical: never crash
+      const el = cells[i];
+      if(!el) continue;
       for(const rc of removeClasses) if(rc) el.classList.remove(rc);
       if(addClass) el.classList.add(addClass);
     }
   }
 
-  function clearSelection(){
+  function clearSelectionVisual(){
     paintCells(selection, null, ["sel"]);
     selection = [];
   }
 
-  function currentString(){
-    return selection.map(i => {
-      const el = cellElByIdx(i);
-      return el ? el.firstChild.textContent : "";
-    }).join("");
+  function addToSelection(i){
+    if(selection.includes(i)) return;
+    selection.push(i);
+    paintCells([i], "sel");
   }
 
-  function isAdjacent(a, b){
-    const A = rcOf(a), B = rcOf(b);
-    return Math.abs(A.r - B.r) <= 1 && Math.abs(A.c - B.c) <= 1 && !(A.r===B.r && A.c===B.c);
-  }
-
-  function startOrExtendSelection(i){
-    if(selection.length === 0){
-      selection = [i];
-      paintCells([i], "sel");
-      setStatus(currentString());
-      return;
-    }
+  function extendSelection(i){
+    if(selection.length === 0){ addToSelection(i); return; }
     const last = selection[selection.length-1];
 
-    // allow backtracking one step
+    // backtrack by 1
     if(selection.length >= 2 && i === selection[selection.length-2]){
       const removed = selection.pop();
       paintCells([removed], null, ["sel"]);
-      setStatus(currentString());
       return;
     }
 
-    // must be adjacent and not already in path
     if(!isAdjacent(last, i)) return;
     if(selection.includes(i)) return;
 
-    selection.push(i);
-    paintCells([i], "sel");
-    setStatus(currentString());
+    addToSelection(i);
+  }
+
+  function currentString(){
+    return selection.map(i => cells[i]?.textContent || "").join("");
+  }
+
+  // =========================
+  // Found coloring
+  // =========================
+  function applyWordColor(path, hex){
+    const a = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--foundAlpha")) || 0.24;
+    const ba = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--foundBorderAlpha")) || 0.46;
+    for(const idx of path){
+      const el = cells[idx];
+      if(!el) continue;
+      el.style.background = rgba(hex, a);
+      el.style.borderColor = rgba(hex, ba);
+      el.style.boxShadow = `0 0 0 2px ${rgba(hex, 0.12)} inset`;
+    }
   }
 
   function markFound(word){
-    const isSp = (word === puzzle.spangram);
     const path = puzzle.solutionPaths.get(word);
-    if(path){
-      paintCells(path, isSp ? "spangramFound" : "found");
-    }
-    found.add(word);
-    renderFoundList();
-    renderProgress();
-  }
+    if(!path) return;
 
-  function renderFoundList(){
-    foundListEl.innerHTML = "";
-    const all = [puzzle.spangram, ...puzzle.words];
-    for(const w of all){
-      if(!found.has(w)) continue;
-      const chip = document.createElement("div");
-      chip.className = "chip " + (w===puzzle.spangram ? "sp" : "th");
-      chip.textContent = w;
-      foundListEl.appendChild(chip);
-    }
-  }
-
-  function renderProgress(){
-    const totalTargets = 1 + puzzle.words.length;
-    const got = found.size;
-    progressEl.textContent = `Progress: ${got}/${totalTargets}`;
-  }
-
-  // ====== PUZZLE GENERATION ======
-  // We need to:
-  // 1) Choose a pack
-  // 2) Pick a subset of theme words so total letters = grid size with the spangram
-  // 3) Lay each word as an actual path in the grid (no overlaps)
-  // 4) Fill letters accordingly
-  //
-  // This guarantees every letter belongs to a word -> NYT-like.
-  function pickPack(){
-    const p = PACKS[randU32() % PACKS.length];
-    const sp = lettersOnly(p.spangram);
-    const ws = p.words.map(lettersOnly).filter(Boolean);
-
-    return { theme: p.theme, spangram: sp, words: ws };
-  }
-
-  function chooseWordsToFitGrid(spangram, words){
-    // target letters total = TOTAL
-    // we force the spangram in, then choose theme words to fill remaining letters.
-    const remain = TOTAL - spangram.length;
-    if(remain <= 0) throw new Error("Spangram too long for grid");
-
-    // Greedy pick longer words first, then adjust
-    const sorted = words.slice().sort((a,b)=> b.length - a.length);
-    const chosen = [];
-    let left = remain;
-
-    for(const w of sorted){
-      if(w.length <= left && chosen.length < 8){
-        chosen.push(w);
-        left -= w.length;
-      }
-      if(left === 0) break;
+    if(word === puzzle.spangram){
+      applyWordColor(path, SPANGRAM_COLOR);
+      return;
     }
 
-    // If not exact fill, try swapping / smaller words
-    if(left !== 0){
-      // brute-ish small search limited
-      const pool = words.slice().sort((a,b)=> a.length - b.length);
-      for(let tries=0; tries<4000 && left !== 0; tries++){
-        // restart attempt
-        chosen.length = 0;
-        left = remain;
-
-        // random pick to try exact fill
-        const bag = pool.slice();
-        shuffle(bag);
-
-        for(const w of bag){
-          if(w.length <= left && chosen.length < 10){
-            chosen.push(w);
-            left -= w.length;
-          }
-          if(left === 0) break;
-        }
-      }
+    let col = foundWordColors.get(word);
+    if(!col){
+      const used = new Set(foundWordColors.values());
+      col = WORD_PALETTE.find(c => !used.has(c)) || WORD_PALETTE[randU32()%WORD_PALETTE.length];
+      foundWordColors.set(word, col);
     }
-
-    // Still not exact? pad with extra letters from spangram (allowed in this clone)
-    // But to keep it “real”, we instead extend the grid by sprinkling duplicate letters
-    // while still being selectable; NYT has filler letters that still belong to words.
-    // Here we enforce exact fill by trimming chosen until fits, then add a SHORT word list.
-    if(left !== 0){
-      // try exact fill by selecting a different subset (simple backtrack)
-      const pool = words.slice().filter(w => w.length <= remain);
-      for(let attempt=0; attempt<2000; attempt++){
-        const picked = [];
-        let L = remain;
-        const bag = pool.slice();
-        shuffle(bag);
-        for(const w of bag){
-          if(w.length <= L && picked.length < 10){
-            picked.push(w);
-            L -= w.length;
-          }
-          if(L === 0) break;
-        }
-        if(L === 0) return picked;
-      }
-
-      // last resort: allow a couple single-letter "theme" fillers (still solvable)
-      const fillers = ["A","E","I","O","U"];
-      while(left > 0){
-        chosen.push(fillers[randU32()%fillers.length]);
-        left--;
-      }
-    }
-
-    return chosen;
+    applyWordColor(path, col);
   }
 
+  // =========================
+  // Generator
+  // =========================
   function emptyBoard(){
-    const used = new Array(TOTAL).fill(false);
-    const letters = new Array(TOTAL).fill("");
-    return { used, letters };
+    return { used: new Array(TOTAL).fill(false), letters: new Array(TOTAL).fill("") };
   }
 
   function tryPlaceWordPath(word, board){
-    // Find a random simple path of length word.length with no overlaps.
-    // Start at random cell, random walk with backtracking.
     const W = word.length;
-    for(let attempt=0; attempt<1800; attempt++){
-      const start = randU32() % TOTAL;
+    const starts = [];
+    for(let i=0;i<TOTAL;i++){
+      if(board.used[i]) continue;
+      starts.push(i);
+    }
+    shuffle(starts);
+
+    const MAX_STARTS = Math.min(starts.length, 26);
+
+    for(let si=0; si<MAX_STARTS; si++){
+      const start = starts[si];
       const path = [];
-      const usedLocal = new Set(); // indices for this word
+      const usedLocal = new Set();
+
       function dfs(idx, pos){
         path.push(idx);
         usedLocal.add(idx);
-
         if(pos === W-1) return true;
 
-        const {r,c} = rcOf(idx);
-        const neigh = neighbors(r,c).map(p => idxOf(p.r,p.c));
+        const neigh = neighborsIdx(idx).filter(n => !board.used[n] && !usedLocal.has(n));
+        if(neigh.length === 0){
+          usedLocal.delete(idx);
+          path.pop();
+          return false;
+        }
         shuffle(neigh);
-
         for(const n of neigh){
-          if(board.used[n]) continue;
-          if(usedLocal.has(n)) continue;
           if(dfs(n, pos+1)) return true;
         }
-
         usedLocal.delete(idx);
         path.pop();
         return false;
       }
 
-      if(board.used[start]) continue;
       if(dfs(start, 0)){
-        // commit
         for(let i=0;i<path.length;i++){
           const idx = path[i];
           board.used[idx] = true;
@@ -704,126 +956,277 @@
     return null;
   }
 
-  function generatePuzzle(){
-    // keep trying until we build a valid full board
-    for(let attempt=0; attempt<250; attempt++){
-      const pack = pickPack();
-      const words = chooseWordsToFitGrid(pack.spangram, pack.words);
-
-      const board = emptyBoard();
-      const solutionPaths = new Map();
-
-      // Place spangram first (hardest)
-      const spPath = tryPlaceWordPath(pack.spangram, board);
-      if(!spPath) continue;
-      solutionPaths.set(pack.spangram, spPath);
-
-      // Place theme words
-      let ok = true;
-      const chosenWords = [];
-      for(const w of words){
-        const path = tryPlaceWordPath(w, board);
-        if(!path){ ok=false; break; }
-        solutionPaths.set(w, path);
-        chosenWords.push(w);
+  function buildSnakePath(){
+    const path = [];
+    for(let r=0;r<ROWS;r++){
+      if(r % 2 === 0){
+        for(let c=0;c<COLS;c++) path.push(idxOf(r,c));
+      } else {
+        for(let c=COLS-1;c>=0;c--) path.push(idxOf(r,c));
       }
-      if(!ok) continue;
-
-      // Ensure fully filled
-      if(board.letters.some(ch => !ch)) continue;
-
-      return {
-        theme: pack.theme,
-        spangram: pack.spangram,
-        words: chosenWords,
-        gridLetters: board.letters,
-        solutionPaths
-      };
     }
-    throw new Error("Failed to generate puzzle");
+    return path;
   }
 
-  // ====== GAME LOOP ======
+  function placeBySinglePath(spangram, words){
+    const fullPath = buildSnakePath();
+    const board = emptyBoard();
+    const solutionPaths = new Map();
+
+    const allWords = [spangram, ...words];
+    let cursor = 0;
+
+    for(const w of allWords){
+      const slice = fullPath.slice(cursor, cursor + w.length);
+      cursor += w.length;
+      for(let i=0;i<slice.length;i++){
+        board.used[slice[i]] = true;
+        board.letters[slice[i]] = w[i];
+      }
+      solutionPaths.set(w, slice);
+    }
+    return { letters: board.letters, solutionPaths };
+  }
+
+  function pickSixExactFill(words, remain){
+    const pool = words
+      .map(toLettersOnly)
+      .filter(w => w.length >= 3 && w.length <= 14);
+    if(pool.length < 6) return null;
+
+    const chosen = [];
+    const used = new Set();
+
+    function dfs(startIdx, k, sum){
+      if(k === THEME_WORD_COUNT) return sum === remain;
+
+      const left = THEME_WORD_COUNT - k;
+      const minLen = 3 * left;
+      const maxLen = 14 * left;
+      if(sum > remain) return false;
+      if(sum + minLen > remain) return false;
+      if(sum + maxLen < remain) return false;
+
+      for(let i=startIdx; i<pool.length; i++){
+        const w = pool[i];
+        if(used.has(w)) continue;
+        used.add(w);
+        chosen.push(w);
+        if(dfs(i+1, k+1, sum + w.length)) return true;
+        chosen.pop();
+        used.delete(w);
+      }
+      return false;
+    }
+
+    for(let tries=0; tries<30; tries++){
+      chosen.length = 0;
+      used.clear();
+      shuffle(pool);
+      if(dfs(0, 0, 0)) return chosen.slice();
+    }
+    return null;
+  }
+
+  function generatePuzzle(){
+    // Try multiple banks from deck to keep variety
+    for(let bankTry=0; bankTry<220; bankTry++){
+      const bank = nextBank();
+      let sp = toLettersOnly(pickOne(bank.spangrams));
+      if(sp.length < 14 || sp.length > 22) continue;
+
+      const remain = TOTAL - sp.length;
+      const words = pickSixExactFill(bank.words, remain);
+      if(!words) continue;
+
+      // Natural placement first
+      for(let placeTry=0; placeTry<70; placeTry++){
+        const board = emptyBoard();
+        const solutionPaths = new Map();
+        const all = [{w: sp}, ...words.map(w => ({w}))].sort((a,b)=> b.w.length - a.w.length);
+
+        let ok = true;
+        for(const item of all){
+          const p = tryPlaceWordPath(item.w, board);
+          if(!p){ ok=false; break; }
+          solutionPaths.set(item.w, p);
+        }
+        if(!ok) continue;
+        if(board.letters.some(ch => !ch)) continue;
+
+        return { theme: bank.label, spangram: sp, words, gridLetters: board.letters, solutionPaths };
+      }
+
+      // Guaranteed placement fallback (still consistent, no garbage words)
+      const placed = placeBySinglePath(sp, words);
+      return { theme: bank.label, spangram: sp, words, gridLetters: placed.letters, solutionPaths: placed.solutionPaths };
+    }
+
+    // Force something
+    reshuffleDeck();
+    const bank = nextBank();
+    let sp = toLettersOnly(pickOne(bank.spangrams));
+    if(sp.length > 22) sp = sp.slice(0,22);
+    while(sp.length < 14) sp += sp[sp.length-1] || "A";
+
+    const remain = TOTAL - sp.length;
+    const words = pickSixExactFill(bank.words, remain) || bank.words.slice(0,6).map(toLettersOnly);
+    const placed = placeBySinglePath(sp, words);
+    return { theme: bank.label, spangram: sp, words, gridLetters: placed.letters, solutionPaths: placed.solutionPaths };
+  }
+
+  // =========================
+  // Hints (credits)
+  // =========================
+  function doHint(){
+    if(!(hintCredits > 0 && hintsUsed < MAX_HINTS)) return;
+
+    const remaining = puzzle.words.filter(w => !foundTheme.has(w) && !hinted.has(w));
+    if(remaining.length === 0){
+      toast("Nothing left to hint");
+      hintCredits = 0;
+      updateThemeUI();
+      return;
+    }
+
+    hintCredits--;
+    hintsUsed++;
+    updateThemeUI();
+
+    const target = remaining[randU32() % remaining.length];
+    hinted.add(target);
+
+    const path = puzzle.solutionPaths.get(target);
+    if(!path){ toast("Hint failed"); return; }
+
+    paintCells(path, "sel");
+    toast("Hint");
+    setTimeout(() => paintCells(path, null, ["sel"]), 900);
+  }
+  hintBtn.addEventListener("click", doHint);
+
+  function showSpangramModal(){
+    modalBackdrop.classList.add("show");
+  }
+
+  function awardCredit(){
+    if(hintCredits >= MAX_CREDITS) return;
+    if(hintsUsed >= MAX_HINTS) return;
+    hintCredits++;
+    updateThemeUI();
+    toast("Bonus word! +1 credit");
+  }
+
+  // =========================
+  // Submit logic
+  // =========================
+  function autoSubmitSelection(){
+    const word = currentString();
+    clearSelectionVisual();
+    statusPill.textContent = "Drag letters to form words";
+
+    if(word.length < 3) return;
+
+    // spangram
+    if(word === puzzle.spangram){
+      if(foundSpangram){ toast("Already found"); return; }
+      foundSpangram = true;
+      markFound(word);
+      toast("Spangram!");
+      showSpangramModal();
+      updateThemeUI();
+      checkSolved();
+      return;
+    }
+
+    // theme word
+    if(puzzle.words.includes(word)){
+      if(foundTheme.has(word)){ toast("Already found"); return; }
+      foundTheme.add(word);
+      markFound(word);
+      toast("Theme word");
+      updateThemeUI();
+      checkSolved();
+      return;
+    }
+
+    // bonus real word => credit
+    if(word.length >= MIN_BONUS_LEN){
+      if(!dictReady){
+        toast("Not a theme word");
+        return;
+      }
+      if(isRealWord(word)){
+        if(bonusFound.has(word)){
+          toast("Bonus already found");
+          return;
+        }
+        bonusFound.add(word);
+        awardCredit();
+        return;
+      }
+    }
+
+    toast("Not a word");
+  }
+
+  function checkSolved(){
+    if(foundSpangram && foundTheme.size === THEME_WORD_COUNT){
+      statusPill.textContent = "Solved!";
+      toast("Solved!", 1800);
+    }
+  }
+
+  // =========================
+  // New game
+  // =========================
+
   function newGame(){
-    revealed = false;
-    found = new Set();
-    clearSelection();
+    selection = [];
+    foundTheme = new Set();
+    foundSpangram = false;
+    foundWordColors = new Map();
+
+    hintCredits = 0;
+    hintsUsed = 0;
+    hinted = new Set();
+    bonusFound = new Set();
 
     const seed = randU32().toString(16).toUpperCase();
-    seedEl.textContent = `Puzzle seed: ${seed}`;
+    seedPill.textContent = `Seed: ${seed}`;
 
     puzzle = generatePuzzle();
-
-    themeTitleEl.textContent = puzzle.theme;
-    themeSubEl.textContent = `Spangram length: ${puzzle.spangram.length} • Theme words: ${puzzle.words.length}`;
-
-    buildGridDOM(puzzle.gridLetters); // IMPORTANT: grid exists BEFORE any painting
-    renderFoundList();
-    renderProgress();
-    setStatus("Ready");
+    buildGridDOM(puzzle.gridLetters);
+    updateThemeUI();
+    statusPill.textContent = "Drag letters to form words";
     toast("New puzzle");
   }
 
-  function submit(){
-    if(!puzzle || selection.length < 3){
-      toast("Select at least 3 letters");
-      return;
-    }
-    const guess = currentString();
-
-    // valid if equals a theme word or spangram and not already found
-    const all = new Set([puzzle.spangram, ...puzzle.words]);
-    if(!all.has(guess)){
-      setStatus("Not a word in this puzzle", "bad");
-      toast("Nope");
-      return;
-    }
-    if(found.has(guess)){
-      setStatus("Already found", "warn");
-      toast("Already");
-      clearSelection();
-      return;
-    }
-
-    markFound(guess);
-    setStatus(guess === puzzle.spangram ? "Spangram!" : "Theme word!", "ok");
-    toast(guess === puzzle.spangram ? "Spangram!" : "Theme word!");
-    clearSelection();
-
-    if(found.size === (1 + puzzle.words.length)){
-      setStatus("Solved!", "ok");
-      toast("Solved!", 1800);
-      revealed = true;
-    }
-  }
-
-  function reveal(){
-    if(!puzzle) return;
-    revealed = true;
-
-    // mark everything as found + paint paths
-    const all = [puzzle.spangram, ...puzzle.words];
-    for(const w of all){
-      if(!found.has(w)) markFound(w);
-    }
-    setStatus("Revealed", "warn");
-    toast("Revealed", 1600);
-    clearSelection();
-  }
-
-  // ====== WIRE BUTTONS ======
-  document.getElementById("home").addEventListener("click", ()=> location.href="index.html");
-  document.getElementById("new").addEventListener("click", newGame);
-  document.getElementById("submit").addEventListener("click", submit);
-  document.getElementById("clear").addEventListener("click", ()=>{ clearSelection(); setStatus("Cleared"); });
-  document.getElementById("reveal").addEventListener("click", reveal);
-
-  window.addEventListener("keydown", (e)=>{
-    if(e.key === "Enter") submit();
-    if(e.key === "Escape") { clearSelection(); setStatus("Cleared"); }
+  // =========================
+  // Boot
+  // =========================
+  document.getElementById("newBtn").addEventListener("click", () => {
+    statusPill.textContent = "Building puzzle…";
+    setTimeout(newGame, 0);
   });
 
-  // ====== START ======
+  // Fix accidental double declaration
+  // (keep this here to avoid any future edits breaking)
+  // eslint-disable-next-line no-unused-vars
+  function noop(){}
+
+  // Init dict asynchronously, start game immediately
+  (async () => {
+    try{
+      await initDictionary();
+    }catch(e){
+      dictReady = false;
+      dictBloom = null;
+      dictStatus.textContent = "Dictionary: error. Bonus words won’t give credits.";
+    }
+  })();
+
+  // Start puzzle right away
   newGame();
 })();
 </script>
